@@ -19,6 +19,7 @@ import {
     List,
     ListItem,
     ListItemText,
+    Snackbar,
 } from '@material-ui/core';
 import {
     useHistory, useLocation
@@ -27,6 +28,7 @@ import API, { endpoints } from '../../helpers/API';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { useStore } from "react-redux";
 import cookies from 'react-cookies';
+import MuiAlert from '@material-ui/lab/Alert';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -52,16 +54,27 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+function Alert(props) {
+    return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
+
 export default function NewsTourDetail() {
     const classes = useStyles();
     const [open, setOpen] = useState(false);
+    const [open2, setOpen2] = useState(false);
+    const [open3, setOpen3] = useState(false);
+
     const { state } = useLocation();
     const history = useHistory();
     const [tour, setTour] = useState([]);
     const [bookingInfo, setBookingInfo] = useState([]);
 
-    const [people1, setPeople1] = useState();
-    const [people2, setPeople2] = useState();
+    const [people1, setPeople1] = useState(0);
+    const [people2, setPeople2] = useState(0);
+    const [address1, setAddress1] = useState();
+    const [address2, setAddress2] = useState();
+
+
     const [check, setCheck] = useState(false);
 
     const [loading, setLoading] = useState(false)
@@ -88,11 +101,13 @@ export default function NewsTourDetail() {
     // lấy thông tin tour
     const fetchTour = async () => {
         setTimeout(() => {
-            const _path = endpoints['tour-detail'].replace(":id", `${state?.newstour?.tour}`)
+            const _path = endpoints['tour-detail'].replace(":id", (state?.newstour?.tour ? `${state?.newstour?.tour}` : `${state?.newstour?.tour_id}`))
             API.get(_path).then(res => {
                 setTour(res.data)
                 setLoading(false)
-                // console.info('tour: ', res.data)
+                console.info(res.data)
+                setAddress1(res.data.address[0].name)
+                setAddress2(res.data.address[1].name)
             })
         }, 500);
     }
@@ -102,18 +117,13 @@ export default function NewsTourDetail() {
         setTimeout(() => {
             const _path = endpoints['booking'] + endpoints['check-booking'] + `?tour=${state?.newstour?.tour}&customer=${user.id}`;
             API.get(_path).then(res => {
-                setLoading(false)
-                // console.info('res.data', res.data[0].static)
                 if (res.data.length == 0)
                     setCheck(false)
                 else {
-                    // if (res.data[0].static == "HUY TOUR")
-                    //     setCheck(false)
-                    // else
                     setCheck(true)
                     setBookingInfo(res.data)
-                    console.info('res.data', res.data)
                 }
+                setLoading(false)
             })
         }, 500);
     }
@@ -121,16 +131,22 @@ export default function NewsTourDetail() {
     // api post booking
     const booking = async () => {
         try {
-            let pay = people1 * tour.price1 + people2 * tour.price2
-            const body = {
-                "people1": people1,
-                "people2": people2,
-                "totlePrice": pay,
-                "employee": `${state?.newstour?.employee}`,
-                "customer": user.id,
-                "tour": tour.id
+            if (people1 == 0 && people2 == 0)
+                setOpen2(true)
+            else {
+                let pay = people1 * tour.price1 + people2 * tour.price2
+                const body = {
+                    "people1": people1,
+                    "people2": people2,
+                    "totalPrice": pay,
+                    "employee": `${state?.newstour?.employee}`,
+                    "customer": user.id,
+                    "tour": tour.id
+                }
+                let res = await API.post(endpoints['booking'], body)
+                setOpen3(true)
             }
-            let res = await API.post(endpoints['booking'], body)
+            console.info("type", people1)
         } catch (err) {
             console.info(err)
         }
@@ -139,20 +155,25 @@ export default function NewsTourDetail() {
     // api patch booking - thay đổi thông tin
     const changeBooking = async () => {
         try {
-            let pay = people1 * tour.price1 + people2 * tour.price2
-            const body = {
-                "people1": people1,
-                "people2": people2,
-                "totlePrice": pay,
-                "static": "DAT TOUR"
+            if (people1 == 0 && people2 == 0)
+                setOpen2(true)
+            else {
+                let pay = people1 * tour.price1 + people2 * tour.price2
+                const body = {
+                    "people1": people1,
+                    "people2": people2,
+                    "totalPrice": pay,
+                    "static": "DAT TOUR"
+                }
+                const _path = endpoints['booking'] + `${bookingInfo[0].id}/`
+                let res = await API.patch(_path, body)
+                setOpen3(true)
             }
-            const _path = endpoints['booking'] + `${bookingInfo[0].id}/`
-            let res = await API.patch(_path, body)
         } catch (err) {
             console.info(err)
         }
     }
- 
+
     // api patch booking - hủy tour
     const cancleBooking = async () => {
         try {
@@ -206,6 +227,13 @@ export default function NewsTourDetail() {
         setPeople2(e.target.value)
     };
 
+    const handleClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            // return;
+            setOpen2(false);
+        }
+    };
+
     return (
 
         <Container maxWidth='lg'>
@@ -247,6 +275,14 @@ export default function NewsTourDetail() {
                                 className={classes.root}
                             >
                                 <ListItem button>
+                                    <ListItemText secondary="Điểm khởi hàng: " />
+                                    <ListItemText primary={address1} />
+                                </ListItem>
+                                <ListItem button>
+                                    <ListItemText secondary="Điểm đến: " />
+                                    <ListItemText primary={address2} />
+                                </ListItem>
+                                <ListItem button>
                                     <ListItemText secondary="Giá vé người lớn: " />
                                     <ListItemText primary={`${tour.price1} VNĐ`} />
                                 </ListItem>
@@ -255,20 +291,12 @@ export default function NewsTourDetail() {
                                     <ListItemText primary={`${tour.price2} VNĐ`} />
                                 </ListItem>
                                 <ListItem button >
-                                    <ListItemText secondary="Đặt đến ngày: " />
+                                    <ListItemText secondary="Đến ngày: " />
                                     <ListItemText primary={tour.dateEnd} />
                                 </ListItem>
 
                             </List>
-                            {/* {check ? (
-                                <div>
-                                    <Button onClick={() => handlOpen_click()}>Bạn đã đặt tour này</Button>
-                                </div>
-                            ) : (
-                                <div>
 
-                                </div>
-                            )} */}
                             <Button onClick={() => handlOpen_click()}>Đặt tour</Button>
 
                             < Dialog open={open} onClose={handleClose_click} aria-labelledby="form-dialog-title">
@@ -324,7 +352,16 @@ export default function NewsTourDetail() {
             }
 
 
-
+            <Snackbar open={open2} autoHideDuration={6000} onClose={handleClose}>
+                <Alert onClose={handleClose} severity="warning">
+                    Lỗi! Bạn phải nhập số người
+                </Alert>
+            </Snackbar>
+            <Snackbar open={open3} autoHideDuration={6000} onClose={handleClose}>
+                <Alert onClose={handleClose} severity="success">
+                    Bạn đặt tour thành công
+                </Alert>
+            </Snackbar>
 
         </Container >
 

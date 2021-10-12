@@ -39,6 +39,7 @@ import { useStore } from "react-redux";
 import cookies from 'react-cookies';
 import { useHistory } from 'react-router';
 import { PublicRoutes } from '../../routes/public-route';
+import Pagination from '@material-ui/lab/Pagination';
 
 const columns = [
     { id: 'stt', label: 'STT', maxWidth: 20, align: 'center', },
@@ -79,8 +80,9 @@ export default function NewsTourDetail() {
     const [open, setOpen] = useState(false);
     const avatar = createRef();
     const [loading, setLoading] = useState(false)
-
+    // const [page, setPage] = useState(1)
     const [booking, setBooking] = useState([]);
+    const [count, setCount] = useState(0);
 
     const store = useStore();
     const auth = store.getState();
@@ -99,16 +101,16 @@ export default function NewsTourDetail() {
 
     const fetchBooking = async () => {
         setTimeout(() => {
-            const _path = endpoints['booking'] + endpoints['booking-current-user'] + `?customer=${user.id}`
+            const _path = endpoints['booking'] + endpoints['booking-current-user'] + `?page=${page}` + `&customer=${user.id}`
             API.get(_path).then(res => {
                 setBooking(res.data)
-                setLoading(false)
-                // console.info('tour: ', res.data)
+                setCount(res.data.length)
                 setBooking(
                     res.data.map((b, idx) =>
                         createData(idx + 1, b.static, b.people1 + ' người', b.people2 + ' bé', b.totalPrice + ' VNĐ', b.tour_id, b.employee_id),
                     )
                 );
+                setLoading(false)
             })
         }, 500);
     }
@@ -147,32 +149,13 @@ export default function NewsTourDetail() {
 
     const { inputs, handleInputChange, handleSubmit } = useSubmitForm(changeInfo);
 
-    const changeStaticBooking = async (bookingId) => {
-        const formData = new FormData();
-
-        formData.append("static", "DAT TOUR");
-
-        try {
-            const _path = endpoints["booking"] + bookingId
-            // let res = await API.patch(_path, formData, {
-            //     headers: {
-            //         "Content-Type": "multipart/form-data",
-            //     },
-            // });
-            console.info("_path:", _path)
-
-        } catch (err) {
-            console.log("ERROR:\n", err);
-        }
-    };
-
     // chuyển về trang đăng tin tức tour đã booking
     const handleChooseBooking = (tourId, employeeId) => {
         const _pathAPI = endpoints['news-tour'] + endpoints['have-tour'] + `?tour=${tourId}&employee=${employeeId}`;
-        API.get(endpoints['news-tour']).then(res => {
-            const _pathPage = PublicRoutes.NewsTourDetail.path.replace(":id", res.data.results[0].id)
+        API.get(_pathAPI).then(res => {
+            const _pathPage = PublicRoutes.NewsTourDetail.path.replace(":id", res.data[0].id)
             history.push(_pathPage, {
-                newstour: res.data.results[0],
+                newstour: res.data[0],
             })
         })
     }
@@ -200,8 +183,13 @@ export default function NewsTourDetail() {
         // window.location.reload();
     };
 
+    const handleChange = (event, value) => {
+        setPage(value);
+        fetchBooking(value);
+    };
+
     return (
-        <Grid container spacing={10}>
+        <Grid container spacing={8} xs={11}>
             {/* thông tin người dùng */}
             <Grid item xs={5}>
                 <Typography variant="h3" onClick={abc}>Thông tin người dùng</Typography>
@@ -362,6 +350,7 @@ export default function NewsTourDetail() {
                             </TableBody>
                         </Table>
                     </TableContainer>
+
                     <TablePagination
                         rowsPerPageOptions={[5, 10, 20]}
                         component="div"
@@ -372,6 +361,8 @@ export default function NewsTourDetail() {
                         onRowsPerPageChange={handleChangeRowsPerPage}
                     />
                 </Paper>
+                {/* <Pagination count={Math.ceil(count / 6)} page={page} onChange={handleChange} /> */}
+
 
             </Grid>
             <Dialog

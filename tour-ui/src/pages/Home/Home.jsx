@@ -19,7 +19,7 @@ import {
 } from 'react-router-dom';
 import Pagination from '@material-ui/lab/Pagination';
 import API, { endpoints } from '../../helpers/API';
-import { PublicRoutes} from '../../routes/public-route'
+import { PublicRoutes } from '../../routes/public-route'
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -41,6 +41,7 @@ export default function Test() {
     const history = useHistory()
     const [newsTour, setNewsTour] = useState([]);
     const [count, setCount] = useState(0);
+    const [page, setPage] = useState(1)
 
     const [loading, setLoading] = useState(false)
 
@@ -64,6 +65,17 @@ export default function Test() {
         }, 500);
     }
 
+    const fetchNewsTourByPage = async (value) => {
+        setTimeout(() => {
+            const _path = endpoints['news-tour'] + `?page=${value}`
+            API.get(_path).then(res => {
+                setNewsTour(res.data.results)
+                setLoading(false)
+                // console.info('joblist: ', res.data.results)
+            })
+        }, 500);
+    }
+
     const handleNewsTour_click = (n) => {
         // console.info('jobDetail_click: ', j)
         const _path = PublicRoutes.NewsTourDetail.path.replace(":id", n.id)
@@ -73,16 +85,9 @@ export default function Test() {
     };
 
     const handleChange = (event, value) => {
-        // console.info('page truoc:', page)
-        // setPage(value);
-        // console.info('page sau:', page)
-        // fetchJobsByPage(page);
+        setPage(value);
+            fetchNewsTourByPage(value);
     };
-
-    const handlePage_click = (page) => {
-        // setPage(page);
-    }
-
 
     return (
 
@@ -91,13 +96,13 @@ export default function Test() {
 
 
             <div>count: {count}</div>
-            {/* <Typography>Page: {page}</Typography> */}
-            {/* <Pagination count={Math.ceil(count / 3)} page={page} onChange={handleChange} /> */}
+            <Typography>Page: {page}</Typography>
+            <Pagination count={Math.ceil(count / 6)} page={page} onChange={handleChange} />
 
             {loading ? <p>Loading ...</p> :
                 (
                     newsTour.map((n, idx) =>
-                        <Card className={classes.root} key={idx + n.id} onClick={() => handleNewsTour_click(n) }>
+                        <Card className={classes.root} key={idx + n.id} onClick={() => handleNewsTour_click(n)}>
                             <CardActionArea>
                                 <CardMedia
                                     className={classes.media}
