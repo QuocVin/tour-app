@@ -3,24 +3,39 @@ import {
     makeStyles,
     List,
     ListItem,
-    TextField,
+    ListItemText,
     Typography,
-    Grid,
+    Divider,
     Container,
     Button,
     Card,
     CardActionArea,
     CardActions,
     CardMedia,
-    CardContent
+    CardContent,
+    CssBaseline,
+    TextField,
+    FormControlLabel,
+    Checkbox,
+    Link,
+    Grid,
+    Box,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    FormControl,
+    Select,
+    InputLabel,
 } from '@material-ui/core';
+import SearchIcon from '@material-ui/icons/Search';
 import {
     useHistory, useLocation
 } from 'react-router-dom';
 import Pagination from '@material-ui/lab/Pagination';
 import API, { endpoints } from '../../helpers/API';
 import { PublicRoutes } from '../../routes/public-route'
-import SearchIcon from '@material-ui/icons/Search';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -35,14 +50,20 @@ const useStyles = makeStyles((theme) => ({
     media: {
         height: 140,
     },
+    form: {
+        width: '100%', // Fix IE 11 issue.
+        marginTop: theme.spacing(3),
+    },
+    formControl: {
+        margin: theme.spacing(1),
+        minWidth: 120,
+    },
 }));
 
 export default function Test() {
     const classes = useStyles();
-    const history = useHistory()
+    const history = useHistory();
     const [newsTour, setNewsTour] = useState([]);
-    const [count, setCount] = useState(0);
-    const [page, setPage] = useState(1);
     const [title, setTitle] = useState('');
 
 
@@ -52,28 +73,26 @@ export default function Test() {
     useEffect(() => {
         async function init() {
             setLoading(true)
-            await fetchNewsTourByPage()
+            await fetchNewsTour()
+            // await fetchAddress()
+            setLoading(false)
         }
         init()
     }, [])
 
-    // const fetchNewsTour = async () => {
+    // const fetchAddress = async () => {
     //     setTimeout(() => {
-    //         API.get(endpoints['news-tour']).then(res => {
-    //             setNewsTour(res.data.results)
-    //             setCount(res.data.count)
-    //             setLoading(false)
+    //         API.get(endpoints['address']).then(res => {
+    //             setAddressList(res.data)
+    //             console.info(res.data)
     //         })
     //     }, 500);
     // }
 
-    const fetchNewsTourByPage = async (value) => {
+    const fetchNewsTour = async () => {
         setTimeout(() => {
-            const _path = endpoints['news-tour'] + (value ? `?page=${value}` : `?page=1`)
-            API.get(_path).then(res => {
+            API.get(endpoints['news-tour']).then(res => {
                 setNewsTour(res.data.results)
-                setCount(res.data.count)
-                setLoading(false)
             })
         }, 500);
     }
@@ -83,11 +102,6 @@ export default function Test() {
         history.push(_path, {
             newstour: n,
         })
-    };
-
-    const handleChange = (event, value) => {
-        setPage(value);
-        fetchNewsTourByPage(value);
     };
 
     const handleChangeTitle = (e) => {
@@ -114,6 +128,8 @@ export default function Test() {
     return (
 
         <Container maxWidth='sm'>
+            {/* <Pagination count={Math.ceil(count / 6)} page={page} onChange={handleChange} /> */}
+
             <Grid container xs={12} spacing={2}>
                 {/* tìm kiếm title */}
                 <Grid item xs={5}>
@@ -130,6 +146,27 @@ export default function Test() {
                     />
                 </Grid>
 
+                {/* tìm kiếm address */}
+                {/* <Grid item xs={5}>
+                    <FormControl className={classes.formControl}>
+                        <InputLabel htmlFor="address" variant='outlined'>Địa chỉ</InputLabel>
+                        <Select
+                            native
+                            // value={address}
+                            onChange={handleChangeAddress}
+                            inputProps={{
+                                name: 'address',
+                                id: 'address',
+                            }}
+                        >
+                            <option aria-label="None" value="" />
+                            {addressList.map((a) => (
+                                <option value={a.id} key={a.id}>{a.name}</option>
+                            ))}
+                        </Select>
+                    </FormControl>
+                </Grid> */}
+
                 <Grid item xs={2}>
                     <Button
                         fullWidth
@@ -144,9 +181,6 @@ export default function Test() {
 
 
             </Grid>
-
-
-            <Pagination count={Math.ceil(count / 6)} page={page} onChange={handleChange} />
 
             {loading ? <p>Loading ...</p> :
                 (
@@ -169,9 +203,18 @@ export default function Test() {
                                     </Typography>
                                 </CardContent>
                             </CardActionArea>
+                            <CardActions>
+                                <Button size="small" color="primary">
+                                    Share
+                                </Button>
+                                <Button size="small" color="primary">
+                                    Learn More
+                                </Button>
+                            </CardActions>
                         </Card>
                     )
-                )}
+                )
+            }
 
 
 

@@ -73,6 +73,7 @@ export default function NewsTourDetail() {
     const [people2, setPeople2] = useState(0);
     const [address1, setAddress1] = useState();
     const [address2, setAddress2] = useState();
+    const [likes, setLikes] = useState(0);
 
 
     const [check, setCheck] = useState(false);
@@ -94,6 +95,7 @@ export default function NewsTourDetail() {
                 if (user.username != null)
                     await fetchCheckBooking()
             }
+            console.info(state?.newstour.rate)
         }
         init()
     }, [])
@@ -105,7 +107,7 @@ export default function NewsTourDetail() {
             API.get(_path).then(res => {
                 setTour(res.data)
                 setLoading(false)
-                console.info(res.data)
+                // console.info(res.data)
                 setAddress1(res.data.address[0].name)
                 setAddress2(res.data.address[1].name)
             })

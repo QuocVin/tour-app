@@ -7,6 +7,7 @@ import LoginIcon from '@material-ui/icons/PeopleAltOutlined';
 import RegisterPage from '../pages/Register';
 import ProfilePage from '../pages/Profile';
 import NewsTourDetailPage from '../pages/NewsTourDetail';
+import SearchPage from '../pages/Search';
 
 const NEDRoutes = {
     New: "new",
@@ -20,6 +21,7 @@ export const PublicRouteNames = {
     Profile: 'Profile',
     NewsTourDetail: 'NewsTourDetail',
     TourDetail: 'TourDetail',
+    Search: 'Search',
 }
 
 export const AllRouteNames = {
@@ -33,6 +35,7 @@ export const RoutePaths = {
     Profile: ['', PublicRouteNames.Profile].join('/'),
     NewsTourDetail: ['', PublicRouteNames.NewsTourDetail, NEDRoutes.Detail].join('/'),
     TourDetail: ['', PublicRouteNames.TourDetail, NEDRoutes.Detail].join('/'),
+    Search: ['', PublicRouteNames.Search].join('/'),
 
 }
 
@@ -77,5 +80,12 @@ export const PublicRoutes = {
         component: NewsTourDetailPage,
         icon: LoginIcon
     },
-
+    Search: {
+        exact: true,
+        id: PublicRouteNames.Search,
+        label: "Search label",
+        path: RoutePaths.Search,
+        component: SearchPage,
+        icon: LoginIcon
+    },
 }

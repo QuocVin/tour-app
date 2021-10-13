@@ -49,11 +49,19 @@ class TypeSerializer(ModelSerializer):
         fields = '__all__'
 
 
+class RateSerializer(ModelSerializer):
+    class Meta:
+        model = Rate
+        fields = '__all__'
+
+
 class NewsTourSerializer(ModelSerializer):
+    rate = RateSerializer(many=True)
+
     class Meta:
         model = NewsTour
         fields = ['id', 'title', 'descriptions', 'static',
-                  'employee', 'tour', 'dateEnd', 'dateCreate', 'image']
+                  'employee', 'tour', 'dateEnd', 'dateCreate', 'image', 'rate']
 
 
 class TourSerializer(ModelSerializer):

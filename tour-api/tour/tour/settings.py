@@ -47,10 +47,10 @@ INSTALLED_APPS = [
 ]
 
 REST_FRAMEWORK = {
-    # Dùng rest framework để phân trang
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    # Mỗi respond trả về 2 trang
-    'PAGE_SIZE': '6',
+    # # Dùng rest framework để phân trang
+    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    # # Mỗi respond trả về 2 trang
+    # 'PAGE_SIZE': '6',
     # Cấu hình lớp sử dụng để chứng thực
     'DEFAULT_AUTHENTICATION_CLASSES': ('oauth2_provider.contrib.rest_framework.OAuth2Authentication', ),
 }

@@ -107,6 +107,19 @@ class NewsTourViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.ListAPI
             query = NewsTour.objects.filter(
                 tour=request.query_params.__getitem__('tour'),
                 employee=request.query_params.__getitem__('employee'),
+                static='DANG MO',
+            )
+            return Response(list(query.values()))
+        return Response({"invalid request": "not found"},
+                        status.HTTP_400_BAD_REQUEST)
+
+    # tìm kiếm bài viết qua title
+    @action(methods=['get'], detail=False, url_path='search-title')
+    def search_title(self, request):
+        if request.query_params.__contains__('title'):
+            query = NewsTour.objects.filter(
+                title__icontains=request.query_params.__getitem__('title'),
+                static='DANG MO',
             )
             return Response(list(query.values()))
         return Response({"invalid request": "not found"},
@@ -116,6 +129,11 @@ class NewsTourViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.ListAPI
 class TourViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.ListAPIView, generics.RetrieveAPIView):
     queryset = Tour.objects.all()
     serializer_class = TourSerializer
+
+
+class AddressViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.ListAPIView, generics.RetrieveAPIView):
+    queryset = Address.objects.all()
+    serializer_class = AddressSerializer
 
 
 class BookingViewSet(viewsets.ViewSet, generics.CreateAPIView,
