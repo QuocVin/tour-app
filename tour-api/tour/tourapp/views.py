@@ -56,18 +56,39 @@ class UserViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.UpdateAPIVi
     # Tạo API lấy dữ liệu khách hàng
     @action(methods=['get'], detail=False, url_path='customer')
     def get_customer(self, request):
-        query = User.objects.filter(
-            role='NGUOI DUNG'
-        )
-        return Response(list(query.values()), status.HTTP_200_OK)
+        if request.query_params.__contains__('email'):
+            query = User.objects.filter(
+                role='NGUOI DUNG',
+                email__icontains=request.query_params.__getitem__('email'),
+            )
+            return Response(list(query.values()), status.HTTP_200_OK)
+        if request.query_params.__contains__('id'):
+            query = User.objects.filter(
+                role='NGUOI DUNG',
+                id=request.query_params.__getitem__('id'),
+            )
+            return Response(list(query.values()), status.HTTP_200_OK)
+        return Response({"invalid request": "not found"},
+                        status.HTTP_400_BAD_REQUEST)
 
-        # Tạo API lấy dữ liệu nhân viên
+    # Tạo API lấy dữ liệu nhân viên
     @action(methods=['get'], detail=False, url_path='employee')
     def get_employee(self, request):
-        query = User.objects.filter(
-            role='NHAN VIEN'
-        )
-        return Response(list(query.values()), status.HTTP_200_OK)
+        if request.query_params.__contains__('email'):
+            query = User.objects.filter(
+                role='NHAN VIEN',
+                email__icontains=request.query_params.__getitem__('email'),
+            )
+            return Response(list(query.values()), status.HTTP_200_OK)
+
+        if request.query_params.__contains__('id'):
+            query = User.objects.filter(
+                role='NHAN VIEN',
+                id=request.query_params.__getitem__('id'),
+            )
+            return Response(list(query.values()), status.HTTP_200_OK)
+        return Response({"invalid request": "not found"},
+                        status.HTTP_400_BAD_REQUEST)
 
     def create(self, request, *args, **kwargs):
 

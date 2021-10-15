@@ -40,6 +40,7 @@ import cookies from 'react-cookies';
 import { useHistory } from 'react-router';
 import Pagination from '@material-ui/lab/Pagination';
 import AppTable from '../../components/Table';
+import SearchIcon from '@material-ui/icons/Search';
 
 
 const columns = [
@@ -85,20 +86,22 @@ export default function Employee() {
     const classes = useStyles();
     const history = useHistory();
     const [loading, setLoading] = useState(false)
+    const [email, setEmail] = useState('');
 
     const [users, setUsers] = useState([])
 
     useEffect(() => {
         async function init() {
-            setLoading(true)
+            // setLoading(true)
             await fetchUser()
         }
         init()
     }, [])
 
     const fetchUser = async () => {
+        setLoading(true)
         setTimeout(() => {
-            const _path = endpoints['user'] + endpoints['employee']
+            const _path = endpoints['user'] + endpoints['employee'] + `?email=${email}`
             API.get(_path).then(res => {
                 setUsers(
                     res.data.map((b, idx) =>
@@ -110,12 +113,59 @@ export default function Employee() {
         }, 500);
     }
 
+    const handleChangeEmail = (e) => {
+        setEmail(e.target.value)
+    };
+
+    const handleSearch = () => {
+        fetchUser()
+    };
+
+    const handleKeyDown = (e) => {
+        if (e.key === "Enter") {
+            handleSearch();
+        }
+    };
+
+
     return (
 
         <Container maxWidth='lg'>
             <div>Employee</div>
-            <AppTable columns={columns} data={users}/>
-         
+            {/* tìm kiếm */}
+            <Grid container xs={12} spacing={2}>
+                <Grid item xs={5}>
+                    <TextField
+                        autoComplete="username"
+                        variant="outlined"
+                        fullWidth
+                        name="title"
+                        label="email người dùng . . ."
+                        type="text"
+                        id="title"
+                        value={email}
+                        onChange={handleChangeEmail}
+                        onKeyDown={handleKeyDown}
+                    />
+                </Grid>
+                <Grid item xs={2}>
+                    <Button
+                        fullWidth
+                        variant="contained"
+                        color="primary"
+                        className={classes.submit}
+                        onClick={handleSearch}
+                    >
+                        <SearchIcon />
+                    </Button>
+                </Grid>
+            </Grid>
+
+            {/* bản thông tin */}
+            {loading ? <p>Loading ...</p> :
+                <AppTable columns={columns} data={users} />
+            }
+
         </Container>
 
 

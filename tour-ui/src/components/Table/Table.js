@@ -81,6 +81,7 @@ export default function AppTable({ columns, data }) {
                                             const value = row[column.id];
                                             return (
                                                 <TableCell key={column.id} align={column.align} >
+                                                {/* <TableCell key={column.id} align={column.align} onClick={() => handleChooseBooking(row.id)}> */}
                                                     {column.format && typeof value === 'number' ? column.format(value) : value}
                                                 </TableCell>
                                             );

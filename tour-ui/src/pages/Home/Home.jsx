@@ -111,6 +111,12 @@ export default function Test() {
         fetchNewsTourByTitle()
     };
 
+    const handleKeyDown = (e) => {
+        if (e.key === "Enter") {
+            handleSearch();
+        }
+    };
+
     return (
 
         <Container maxWidth='sm'>
@@ -127,6 +133,7 @@ export default function Test() {
                         id="title"
                         value={title}
                         onChange={handleChangeTitle}
+                        onKeyDown={handleKeyDown}
                     />
                 </Grid>
 
