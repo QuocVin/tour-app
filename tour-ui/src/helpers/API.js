@@ -6,6 +6,10 @@ export let endpoints = {
     'oauth2-info':          '/oauth2-info/',
     'login':                '/o/token/',
 
+    'customer':             'customer/',
+    'employee':             'employee/',
+
+
     'address':              '/address/',
     'news-tour':            '/news-tour/',
     'search-title':         'search-title/',

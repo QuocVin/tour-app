@@ -53,6 +53,22 @@ class UserViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.UpdateAPIVi
         return Response(self.serializer_class(request.user).data,
                         status.HTTP_200_OK)
 
+    # Tạo API lấy dữ liệu khách hàng
+    @action(methods=['get'], detail=False, url_path='customer')
+    def get_customer(self, request):
+        query = User.objects.filter(
+            role='NGUOI DUNG'
+        )
+        return Response(list(query.values()), status.HTTP_200_OK)
+
+        # Tạo API lấy dữ liệu nhân viên
+    @action(methods=['get'], detail=False, url_path='employee')
+    def get_employee(self, request):
+        query = User.objects.filter(
+            role='NHAN VIEN'
+        )
+        return Response(list(query.values()), status.HTTP_200_OK)
+
     def create(self, request, *args, **kwargs):
 
         # ghi đè lại create

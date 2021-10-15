@@ -7,6 +7,8 @@ import {
 } from "react-router-dom";
 import Layout from "./layouts";
 import { PublicRoutes, RoutePaths } from "./routes/public-route";
+import { ProtectRoutes, AdminPaths } from "./routes/protect-route";
+
 
 function App(props) {
   const loggedIn = false;
@@ -16,6 +18,16 @@ function App(props) {
       <Layout {...props}>
         <Switch>
           {Object.values(PublicRoutes).map((route, idx) => {
+            return (
+              <Route
+                key={idx}
+                path={route.path}
+                exact={route.exact}
+                render={(props) => <route.component {...props} />}
+              />
+            );
+          })}
+          {Object.values(ProtectRoutes).map((route, idx) => {
             return (
               <Route
                 key={idx}

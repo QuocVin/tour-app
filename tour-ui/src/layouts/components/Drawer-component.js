@@ -10,12 +10,14 @@ import {
 import React from "react";
 import { useHistory, useLocation } from "react-router-dom";
 import { PublicRoutes } from "../../routes/public-route"
+import { ProtectRoutes } from "../../routes/protect-route"
 
 export default function ({ classes, open }) {
     const history = useHistory();
     const location = useLocation();
     const [childDrawer, setChildDrawer] = React.useState(
-        Object.values(PublicRoutes)
+        // Object.values(PublicRoutes)
+        Object.values(ProtectRoutes)
     );
 
     const handleItem_click = ({ id, path }) => {
