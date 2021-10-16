@@ -21,9 +21,7 @@ import {
     ListItemText,
     Snackbar,
 } from '@material-ui/core';
-import {
-    useHistory, useLocation
-} from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import API, { endpoints } from '../../helpers/API';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { useStore } from "react-redux";

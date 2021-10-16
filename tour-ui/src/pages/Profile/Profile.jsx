@@ -80,7 +80,6 @@ export default function NewsTourDetail() {
     const [open, setOpen] = useState(false);
     const avatar = createRef();
     const [loading, setLoading] = useState(false)
-    // const [page, setPage] = useState(1)
     const [booking, setBooking] = useState([]);
     const [count, setCount] = useState(0);
 
@@ -91,6 +90,7 @@ export default function NewsTourDetail() {
         user = cookies.load("user")
     };
 
+    //  hiểu đơn giản là load trang
     useEffect(() => {
         async function init() {
             setLoading(true)
@@ -99,6 +99,7 @@ export default function NewsTourDetail() {
         init()
     }, [])
 
+    // lấy dữ liệu các đơn đặt tour của khách
     const fetchBooking = async () => {
         setTimeout(() => {
             const _path = endpoints['booking'] + endpoints['booking-current-user'] + `?page=${page}` + `&customer=${user.id}`
@@ -115,6 +116,7 @@ export default function NewsTourDetail() {
         }, 500);
     }
 
+    // xử lý form cập nhập thông tin người dùng
     const changeInfo = async () => {
         const formData = new FormData();
 
@@ -147,6 +149,7 @@ export default function NewsTourDetail() {
         }
     };
 
+    // hỗ trợ xử lý form
     const { inputs, handleInputChange, handleSubmit } = useSubmitForm(changeInfo);
 
     // chuyển về trang đăng tin tức tour đã booking
@@ -177,15 +180,11 @@ export default function NewsTourDetail() {
         console.info(inputs.last_name)
     }
 
+    // tắt thông báo và cập nhập lại thông tin người dùng sau khi thay đổi
     const handleCloseDialog = () => {
         setOpen(false);
         user = cookies.load("user")
         // window.location.reload();
-    };
-
-    const handleChange = (event, value) => {
-        setPage(value);
-        fetchBooking(value);
     };
 
     return (
@@ -361,10 +360,9 @@ export default function NewsTourDetail() {
                         onRowsPerPageChange={handleChangeRowsPerPage}
                     />
                 </Paper>
-                {/* <Pagination count={Math.ceil(count / 6)} page={page} onChange={handleChange} /> */}
-
-
             </Grid>
+
+            {/* xử lý thông báo khi cập nhập thông tin người dùng */}
             <Dialog
                 open={open}
                 onClose={handleCloseDialog}

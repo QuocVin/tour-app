@@ -77,8 +77,8 @@ const columns = [
     },
 ];
 
-function createData(stt, name, username, email, phone, address) {
-    return { stt, name, username, email, phone, address };
+function createData(stt, name, username, email, phone, address, userId) {
+    return { stt, name, username, email, phone, address, userId };
 }
 
 export default function Customer() {
@@ -105,7 +105,7 @@ export default function Customer() {
             API.get(_path).then(res => {
                 setUsers(
                     res.data.map((b, idx) =>
-                        createData(idx + 1, b.first_name + ` ${b.last_name}`, b.username, b.email, b.phone, b.address),
+                        createData(idx + 1, b.first_name + ` ${b.last_name}`, b.username, b.email, b.phone, b.address, b.id),
                     )
                 );
                 setLoading(false)
@@ -137,17 +137,17 @@ export default function Customer() {
     };
 
     // chọn người dùng trong bảng
-    const handleChooseBooking = (userId) => {
+    const handleChooseUser = (userId) => {
         const _pathAPI = endpoints['user'] + endpoints['customer'] + `?id=${userId}`;
-        // API.get(_pathAPI).then(res => {
-        //     const _pathPage = ProtectRoutes.CustomerNew.path.replace(":id", userId)
-            // history.push(_pathPage, {
-            //     newstour: res.data[0],
-            // })
-        // })
-        const _pathPage = ProtectRoutes.CustomerNew.path.replace(":id", userId)
-        console.info('_pathAPI', _pathAPI)
-        console.info('_pathPage', _pathPage)
+        API.get(_pathAPI).then(res => {
+            const _pathPage = ProtectRoutes.CustomerDetail.path.replace(":id", userId)
+            history.push(_pathPage, {
+                user: res.data[0],
+            })
+        })
+        // const _pathPage = ProtectRoutes.CustomerDetail.path.replace("new", userId)
+        // console.info('_pathAPI', _pathAPI)
+        // console.info('_pathPage', _pathPage)
     }
 
     return (
@@ -196,7 +196,7 @@ export default function Customer() {
 
             {/* bản thông tin */}
             {loading ? <p>Loading ...</p> :
-                <AppTable columns={columns} data={users} />
+                <AppTable columns={columns} data={users} handleChoose={handleChooseUser}/>
             }
         </Container>
 

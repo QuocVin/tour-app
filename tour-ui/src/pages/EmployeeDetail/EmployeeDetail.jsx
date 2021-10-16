@@ -16,7 +16,7 @@ import {
     DialogContentText,
     DialogTitle,
 } from '@material-ui/core';
-import { useStyles } from './CustomerDetail-styles';
+import { useStyles } from './EmployeeDetail-style';
 import API, { endpoints } from '../../helpers/API';
 import useSubmitForm from '../../helpers/CustomHooks'
 import { useHistory, useLocation } from 'react-router';
@@ -80,36 +80,11 @@ export default function InfoCustomer() {
                 console.info('state', 'khong co')
             }
             setLoading(true)
-            await fetchBooking()
+            // await fetchBooking()
         }
         init()
     }, [])
 
-    // lấy dữ liệu các đơn đặt tour của khách
-    const fetchBooking = async () => {
-        setTimeout(() => {
-            const _path = endpoints['booking'] + endpoints['booking-current-user'] + `?customer=${state?.user.id}`
-            API.get(_path).then(res => {
-                setBooking(
-                    res.data.map((b, idx) =>
-                        createData(idx + 1, b.static, b.people1 + ' người', b.people2 + ' bé', b.totalPrice + ' VNĐ', b.tour_id, b.employee_id),
-                    )
-                );
-                setLoading(false)
-            })
-        }, 500);
-    }
-
-    // chuyển về trang đăng tin tức tour đã booking
-    const handleChooseBooking = (tourId, employeeId) => {
-        const _pathAPI = endpoints['news-tour'] + endpoints['have-tour'] + `?tour=${tourId}&employee=${employeeId}`;
-        API.get(_pathAPI).then(res => {
-            const _pathPage = PublicRoutes.NewsTourDetail.path.replace(":id", res.data[0].id)
-            history.push(_pathPage, {
-                newstour: res.data[0],
-            })
-        })
-    }
 
     const create = async () => {
         const formData = new FormData();
@@ -150,7 +125,7 @@ export default function InfoCustomer() {
     return (
         <Container maxWidth='lg'>
             <CssBaseline />
-            <Typography variant="h3">Người dùng {state?.user.username}</Typography>
+            <Typography variant="h3">Nhân viên {state?.user.username}</Typography>
             <Grid container xs={12} spacing={10}>
                 {/* thông tin người dùng */}
                 <Grid item xs={5}>
@@ -286,12 +261,12 @@ export default function InfoCustomer() {
                 </Grid>
 
                 {/* lịch sử giao dịch */}
-                <Grid item xs={7}>
+                {/* <Grid item xs={7}>
                     <Typography variant="h5">Lịch sử giao dịch</Typography>
                     {loading ? <p>Loading ...</p> :
                         <AppTable columns={columns} data={booKing} handleChooseBooking={handleChooseBooking} />
                     }
-                </Grid>
+                </Grid> */}
             </Grid>
 
         </Container>

@@ -41,6 +41,7 @@ import { useHistory } from 'react-router';
 import Pagination from '@material-ui/lab/Pagination';
 import AppTable from '../../components/Table';
 import SearchIcon from '@material-ui/icons/Search';
+import { ProtectRoutes } from '../../routes/protect-route';
 
 
 const columns = [
@@ -78,8 +79,8 @@ const columns = [
     },
 ];
 
-function createData(stt, name, username, email, phone, address) {
-    return { stt, name, username, email, phone, address };
+function createData(stt, name, username, email, phone, address, userId) {
+    return { stt, name, username, email, phone, address, userId};
 }
 
 export default function Employee() {
@@ -105,7 +106,7 @@ export default function Employee() {
             API.get(_path).then(res => {
                 setUsers(
                     res.data.map((b, idx) =>
-                        createData(idx + 1, b.first_name + ` ${b.last_name}`, b.username, b.email, b.phone, b.address),
+                        createData(idx + 1, b.first_name + ` ${b.last_name}`, b.username, b.email, b.phone, b.address, b.id),
                     )
                 );
                 setLoading(false)
@@ -127,6 +128,15 @@ export default function Employee() {
         }
     };
 
+    const handleChooseUser = (userId) => {
+        const _pathAPI = endpoints['user'] + endpoints['employee'] + `?id=${userId}`;
+        API.get(_pathAPI).then(res => {
+            const _pathPage = ProtectRoutes.EmployeeDetail.path.replace(":id", userId)
+            history.push(_pathPage, {
+                user: res.data[0],
+            })
+        })
+    }
 
     return (
 
@@ -163,7 +173,7 @@ export default function Employee() {
 
             {/* bản thông tin */}
             {loading ? <p>Loading ...</p> :
-                <AppTable columns={columns} data={users} />
+                <AppTable columns={columns} data={users} handleChoose={handleChooseUser}/>
             }
 
         </Container>
