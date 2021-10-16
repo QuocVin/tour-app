@@ -34,7 +34,7 @@ import {
 } from '@material-ui/core';
 import useSubmitForm from '../../helpers/CustomHooks'
 import API, { endpoints } from '../../helpers/API';
-import { useStyles } from './Employee-styles';
+import { useStyles } from './AdminTour-styles';
 import { useStore } from "react-redux";
 import cookies from 'react-cookies';
 import { useHistory } from 'react-router';
@@ -47,66 +47,84 @@ import { ProtectRoutes } from '../../routes/protect-route';
 const columns = [
     { id: 'stt', label: 'STT', maxWidth: 20, align: 'center', },
     {
-        id: 'name',
-        label: 'Tên nhân viên',
+        id: 'title',
+        label: 'Tiêu đề',
         minWidth: 100,
         align: 'left',
     },
     {
-        id: 'username',
-        label: 'Tài khoản',
+        id: 'dateStart',
+        label: 'Ngày đăng',
         minWidth: 100,
         align: 'left',
     },
     {
-        id: 'email',
-        label: 'Email',
+        id: 'dateEnd',
+        label: 'Hạn',
         minWidth: 100,
         align: 'left',
     },
     {
-        id: 'phone',
-        label: 'Số điện thoại',
+        id: 'price1',
+        label: 'Vé người lớn',
         minWidth: 100,
         align: 'right',
     },
     {
-        id: 'address',
-        label: 'Địa chỉ',
+        id: 'price2',
+        label: 'Vé trẻ em',
+        minWidth: 150,
+        align: 'right',
+    },
+    {
+        id: 'pointStart',
+        label: 'Điểm xuất phát',
         minWidth: 150,
         align: 'left',
-        // format: (value) => value.toFixed(2),
+    },
+    {
+        id: 'pointEnd',
+        label: 'Điểm đến',
+        minWidth: 150,
+        align: 'left',
+    },
+    {
+        id: 'static1',
+        label: 'Trạng thái',
+        minWidth: 150,
+        align: 'left',
     },
 ];
 
-function createData(stt, name, username, email, phone, address, userId) {
-    return { stt, name, username, email, phone, address, userId };
+function createData(stt, title, dateStart, dateEnd, price1, price2, pointStart, pointEnd, static1) {
+    return { stt, title, dateStart, dateEnd, price1, price2, pointStart, pointEnd, static1 };
 }
 
-export default function Employee() {
+export default function AdminTour() {
     const classes = useStyles();
     const history = useHistory();
     const [loading, setLoading] = useState(false)
-    const [email, setEmail] = useState('');
+    const [title, setTitle] = useState('');
 
-    const [users, setUsers] = useState([])
+    const [tour, setTour] = useState([])
 
     useEffect(() => {
         async function init() {
             // setLoading(true)
-            await fetchUser()
+            await fetchTour()
         }
         init()
     }, [])
 
-    const fetchUser = async () => {
+    const fetchTour = async () => {
         setLoading(true)
         setTimeout(() => {
-            const _path = endpoints['user'] + endpoints['employee'] + `?email=${email}`
+            const _path = endpoints['tour']
             API.get(_path).then(res => {
-                setUsers(
+                setTour(
                     res.data.map((b, idx) =>
-                        createData(idx + 1, b.first_name + ` ${b.last_name}`, b.username, b.email, b.phone, b.address, b.id),
+                        createData(idx + 1, b.title, b.dateStart, b.dateEnd, b.price1 + ' VNĐ'
+                            , b.price2 + ' VNĐ', b.address[0].name, b.address[1].name, b.static)
                     )
                 );
                 setLoading(false)
@@ -114,12 +132,12 @@ export default function Employee() {
         }, 500);
     }
 
-    const handleChangeEmail = (e) => {
-        setEmail(e.target.value)
+    const handleChangeTitle = (e) => {
+        setTitle(e.target.value)
     };
 
     const handleSearch = () => {
-        fetchUser()
+        fetchTour()
     };
 
     const handleKeyDown = (e) => {
@@ -128,45 +146,45 @@ export default function Employee() {
         }
     };
 
-    const handleChooseUser = (userId) => {
-        const _pathAPI = endpoints['user'] + endpoints['employee'] + `?id=${userId}`;
-        API.get(_pathAPI).then(res => {
-            const _pathPage = ProtectRoutes.EmployeeDetail.path.replace(":id", userId)
-            history.push(_pathPage, {
-                user: res.data[0],
-            })
-        })
+    const handleChooseTour = (userId) => {
+        // const _pathAPI = endpoints['user'] + endpoints['employee'] + `?id=${userId}`;
+        // API.get(_pathAPI).then(res => {
+        //     const _pathPage = ProtectRoutes.EmployeeDetail.path.replace(":id", userId)
+        //     history.push(_pathPage, {
+        //         user: res.data[0],
+        //     })
+        // })
+        console.info('choose')
     }
 
     // chọn nút tạo mới
     const handleCreate = () => {
-        const _path = ProtectRoutes.EmployeeNew.path;
+        const _path = ProtectRoutes.TourNew.path;
         history.push(_path);
     };
 
     return (
 
         <Container maxWidth='lg'>
-            <Typography variant="h3">Quản lý nhân viên</Typography>
+            <Typography variant="h3">Quản lý tour</Typography>
             {/* tìm kiếm */}
             <Grid container xs={12} spacing={2}>
                 <Grid item xs={5}>
                     <TextField
-                        autoComplete="username"
                         variant="outlined"
                         fullWidth
                         name="title"
-                        label="email người dùng . . ."
+                        label="tiêu đề bài viết . . ."
                         type="text"
                         id="title"
-                        value={email}
-                        onChange={handleChangeEmail}
+                        value={title}
+                        onChange={handleChangeTitle}
                         onKeyDown={handleKeyDown}
                     />
                 </Grid>
-                <Grid item xs={2}>
+                <Grid item xs={7}>
                     <Button
-                        fullWidth
+                        // fullWidth
                         variant="contained"
                         color="primary"
                         className={classes.submit}
@@ -188,7 +206,7 @@ export default function Employee() {
 
             {/* bản thông tin */}
             {loading ? <p>Loading ...</p> :
-                <AppTable columns={columns} data={users} handleChoose={handleChooseUser} />
+                <AppTable columns={columns} data={tour} handleChoose={handleChooseTour} />
             }
 
         </Container>

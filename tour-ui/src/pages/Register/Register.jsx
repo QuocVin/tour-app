@@ -104,7 +104,6 @@ export default function Register(props) {
                                                 id="username"
                                                 value={inputs.username}
                                                 onChange={handleInputChange}
-                                                name="username"
                                             />
                                         </Grid>
                                         <Grid item xs={12}>
@@ -256,9 +255,6 @@ export default function Register(props) {
                         >
                             Đăng ký
                         </Button>
-                        {/* <Button color="primary" autoFocus>
-            Sign Up
-          </Button> */}
                         <Grid container justifyContent="flex-end">
                             <Grid item>
                                 <Link href="/Login" variant="body2">

@@ -1,13 +1,9 @@
-import React, { createRef, useEffect, useState } from 'react';
+import React, { createRef, useState } from 'react';
 import {
     Button,
     CssBaseline,
     TextField,
-    FormControlLabel,
-    Checkbox,
-    Link,
     Grid,
-    Box,
     Typography,
     Container,
     Dialog,
@@ -15,12 +11,18 @@ import {
     DialogContent,
     DialogContentText,
     DialogTitle,
+    Snackbar,
 } from '@material-ui/core';
+import MuiAlert from '@material-ui/lab/Alert';
 import { useStyles } from './EmployeeNew-styles';
 import API, { endpoints } from '../../helpers/API';
 import useSubmitForm from '../../helpers/CustomHooks'
-import { useHistory, useLocation } from 'react-router';
+import { useHistory } from 'react-router';
 import { ProtectRoutes } from '../../routes/protect-route';
+
+function Alert(props) {
+    return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 export default function CreateCustomer() {
     const classes = useStyles();
@@ -28,10 +30,10 @@ export default function CreateCustomer() {
     const history = useHistory()
 
     const [open, setOpen] = useState(false);
-    const [loading, setLoading] = useState(false)
+    const [openError, setOpenError] = useState(false);
+    // const [loading, setLoading] = useState(false)
 
-    const [booKing, setBooking] = useState([]);
-
+    // api post tạo mới mhân viên
     const create = async () => {
         const formData = new FormData();
 
@@ -39,9 +41,12 @@ export default function CreateCustomer() {
             for (let k in inputs) {
                 if (k !== "confirm_password") formData.append(k, inputs[k]);
             }
-        }
+        } else
+            setOpenError(true)
 
-        formData.append("avatar", avatar.current.files[0]);
+        if (avatar.current.files.length != 0) {
+            formData.append("avatar", avatar.current.files[0]);
+        }
         formData.append("role", "NHAN VIEN");
 
         for (var key of formData.keys()) {
@@ -63,9 +68,26 @@ export default function CreateCustomer() {
 
     const { inputs, handleInputChange, handleSubmit } = useSubmitForm(create);
 
+    // xử lý khi nhấn nút quay về
     const handleBlack = () => {
         const _path = ProtectRoutes.Employee.path;
         history.push(_path);
+    };
+
+    // xử lý sau khi thực hiện tạo nhân viên thành công
+    const handleCloseDialog = () => {
+        setOpen(false);
+        const _path = ProtectRoutes.Employee.path;
+        history.push(_path);
+    };
+    const handleContinue = () => {
+        setOpen(false);
+        window.location.reload();
+    };
+
+    // xử lý khi sai mật khẩu
+    const handleCloseAlert = () => {
+        setOpenError(false);
     };
 
     return (
@@ -88,7 +110,8 @@ export default function CreateCustomer() {
                                             type="text"
                                             id="username"
                                             name="username"
-                                            // label={state?.user.username}
+                                            label="username"
+                                            required
                                             value={inputs.username}
                                             onChange={handleInputChange}
                                         />
@@ -101,6 +124,7 @@ export default function CreateCustomer() {
                                             name="password"
                                             label="Password"
                                             type="password"
+                                            required
                                             autoComplete="current-password"
                                             value={inputs.password}
                                             onChange={handleInputChange}
@@ -111,11 +135,11 @@ export default function CreateCustomer() {
                                         <TextField
                                             id="ConfirmPassword"
                                             variant="outlined"
-                                            required
                                             fullWidth
                                             name="ConfirmPassword"
                                             label="Confirm password"
                                             type="password"
+                                            required
                                             autoComplete="current-password"
                                             value={inputs.confirm_password}
                                             onChange={handleInputChange}
@@ -252,7 +276,33 @@ export default function CreateCustomer() {
                     </Grid>
                 </form>
             </div>
+            <Dialog
+                open={open}
+                onClose={handleCloseDialog}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">Thông báo</DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        Bạn đã tạo mới nhân viên thành công
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseDialog} color="primary" autoFocus>
+                        Quay về
+                    </Button>
+                    <Button onClick={handleContinue} color="primary" autoFocus>
+                        Tạo mới
+                    </Button>
+                </DialogActions>
+            </Dialog>
 
+            <Snackbar open={openError} autoHideDuration={6000} onClose={handleCloseAlert}>
+                <Alert onClose={handleCloseAlert} severity="warning">
+                    Lỗi xác nhận mật khẩu
+                </Alert>
+            </Snackbar>
         </Container>
     );
 }

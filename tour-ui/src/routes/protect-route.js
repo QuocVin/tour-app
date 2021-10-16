@@ -9,6 +9,14 @@ import EmployeePage from "../pages/Employee";
 import EmpNewPage from "../pages/EmployeeNew";
 import EmpDetailPage from "../pages/EmployeeDetail";
 
+import ManageTourPage from "../pages/AdminTour";
+import ManageTourNewPage from "../pages/AdminTourNew";
+
+import ManageNewsPage from "../pages/AdminNews";
+import ManageNewsCrePage from "../pages/AdminNewsCre";
+
+
+
 
 const NEDRoutes = {
     New: "new",
@@ -25,6 +33,12 @@ export const ProtectRouteNames = {
     EmployeeNew: 'EmployeeNew',
     EmployeeDetail: 'EmployeeDetail',
 
+    Tour: 'Tour',
+    TourNew: 'TourNew',
+    
+    NewsTour: 'NewsTour',
+    NewsTourCre: 'NewsTourCre',
+
 }
 
 export const AllRouteNames = {
@@ -39,6 +53,12 @@ export const AdminPaths = {
     Employee: ['', ProtectRouteNames.Employee].join('/'),
     EmployeeNew: ['', ProtectRouteNames.Employee, NEDRoutes.New].join('/'),
     EmployeeDetail: ['', ProtectRouteNames.Employee, NEDRoutes.Detail].join('/'),
+    Tour: ['', ProtectRouteNames.Tour].join('/'),
+    TourNew: ['', ProtectRouteNames.TourNew, NEDRoutes.New].join('/'),
+    // TourDetail: ['', ProtectRouteNames.Employee, NEDRoutes.Detail].join('/'),
+
+    NewsTour: ['', ProtectRouteNames.NewsTour].join('/'),
+    NewsTourCre: ['', ProtectRouteNames.NewsTourCre, NEDRoutes.New].join('/'),
 
 }
 
@@ -94,9 +114,42 @@ export const ProtectRoutes = {
     EmployeeDetail: {
         exact: true,
         id: ProtectRouteNames.EmployeeDetail,
-        label: "Employee",
+        label: "EmployeeDetail",
         path: AdminPaths.EmployeeDetail,
         component: EmpDetailPage,
+        icon: HomeIcon
+    },
+    Tour: {
+        exact: true,
+        id: ProtectRouteNames.Tour,
+        label: "Tour",
+        path: AdminPaths.Tour,
+        component: ManageTourPage,
+        icon: HomeIcon
+    },
+    TourNew: {
+        exact: true,
+        id: ProtectRouteNames.TourNew,
+        label: "TourNew",
+        path: AdminPaths.TourNew,
+        component: ManageTourNewPage,
+        icon: HomeIcon
+    },
+
+    NewsTour: {
+        exact: true,
+        id: ProtectRouteNames.NewsTour,
+        label: "NewsTour",
+        path: AdminPaths.NewsTour,
+        component: ManageNewsPage,
+        icon: HomeIcon
+    },
+    NewsTourCre: {
+        exact: true,
+        id: ProtectRouteNames.NewsTourCre,
+        label: "NewsTourCre",
+        path: AdminPaths.NewsTourCre,
+        component: ManageNewsCrePage,
         icon: HomeIcon
     },
 }

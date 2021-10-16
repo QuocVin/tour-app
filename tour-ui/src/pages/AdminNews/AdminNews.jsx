@@ -34,7 +34,7 @@ import {
 } from '@material-ui/core';
 import useSubmitForm from '../../helpers/CustomHooks'
 import API, { endpoints } from '../../helpers/API';
-import { useStyles } from './Employee-styles';
+import { useStyles } from './AdminNews-styles';
 import { useStore } from "react-redux";
 import cookies from 'react-cookies';
 import { useHistory } from 'react-router';
@@ -47,66 +47,65 @@ import { ProtectRoutes } from '../../routes/protect-route';
 const columns = [
     { id: 'stt', label: 'STT', maxWidth: 20, align: 'center', },
     {
-        id: 'name',
-        label: 'Tên nhân viên',
+        id: 'title',
+        label: 'Tiêu đề',
         minWidth: 100,
         align: 'left',
     },
     {
-        id: 'username',
-        label: 'Tài khoản',
+        id: 'dateCreate',
+        label: 'Ngày đăng',
         minWidth: 100,
         align: 'left',
     },
     {
-        id: 'email',
-        label: 'Email',
+        id: 'dateEnd',
+        label: 'Hạn',
         minWidth: 100,
         align: 'left',
     },
     {
-        id: 'phone',
-        label: 'Số điện thoại',
-        minWidth: 100,
-        align: 'right',
+        id: 'descriptions',
+        label: 'Mô tả',
+        maxWidth: 200,
+        align: 'left',
     },
     {
-        id: 'address',
-        label: 'Địa chỉ',
+        id: 'static1',
+        label: 'Trạng thái',
         minWidth: 150,
         align: 'left',
-        // format: (value) => value.toFixed(2),
     },
 ];
 
-function createData(stt, name, username, email, phone, address, userId) {
-    return { stt, name, username, email, phone, address, userId };
+function createData(stt, title, dateCreate, dateEnd, descriptions, static1) {
+    return { stt, title, dateCreate, dateEnd, descriptions, static1 };
 }
 
-export default function Employee() {
+export default function AdminTour() {
     const classes = useStyles();
     const history = useHistory();
     const [loading, setLoading] = useState(false)
-    const [email, setEmail] = useState('');
+    const [title, setTitle] = useState('');
 
-    const [users, setUsers] = useState([])
+    const [news, setNews] = useState([])
 
     useEffect(() => {
         async function init() {
             // setLoading(true)
-            await fetchUser()
+            await fetchNews()
         }
         init()
     }, [])
 
-    const fetchUser = async () => {
+    const fetchNews = async () => {
         setLoading(true)
         setTimeout(() => {
-            const _path = endpoints['user'] + endpoints['employee'] + `?email=${email}`
+            const _path = endpoints['news-tour'] + endpoints['search-title'] + `?title=${title}`
             API.get(_path).then(res => {
-                setUsers(
+                setNews(
                     res.data.map((b, idx) =>
-                        createData(idx + 1, b.first_name + ` ${b.last_name}`, b.username, b.email, b.phone, b.address, b.id),
+                        createData(idx + 1, b.title, b.dateCreate, b.dateEnd, b.descriptions, b.static)
                     )
                 );
                 setLoading(false)
@@ -114,12 +113,12 @@ export default function Employee() {
         }, 500);
     }
 
-    const handleChangeEmail = (e) => {
-        setEmail(e.target.value)
+    const handleChangeTitle = (e) => {
+        setTitle(e.target.value)
     };
 
     const handleSearch = () => {
-        fetchUser()
+        fetchNews()
     };
 
     const handleKeyDown = (e) => {
@@ -128,45 +127,45 @@ export default function Employee() {
         }
     };
 
-    const handleChooseUser = (userId) => {
-        const _pathAPI = endpoints['user'] + endpoints['employee'] + `?id=${userId}`;
-        API.get(_pathAPI).then(res => {
-            const _pathPage = ProtectRoutes.EmployeeDetail.path.replace(":id", userId)
-            history.push(_pathPage, {
-                user: res.data[0],
-            })
-        })
+    const handleChooseNews = (userId) => {
+        // const _pathAPI = endpoints['user'] + endpoints['employee'] + `?id=${userId}`;
+        // API.get(_pathAPI).then(res => {
+        //     const _pathPage = ProtectRoutes.EmployeeDetail.path.replace(":id", userId)
+        //     history.push(_pathPage, {
+        //         user: res.data[0],
+        //     })
+        // })
+        console.info('choose')
     }
 
     // chọn nút tạo mới
     const handleCreate = () => {
-        const _path = ProtectRoutes.EmployeeNew.path;
+        const _path = ProtectRoutes.NewsTourCre.path;
         history.push(_path);
     };
 
     return (
 
         <Container maxWidth='lg'>
-            <Typography variant="h3">Quản lý nhân viên</Typography>
+            <Typography variant="h3">Quản lý tin du lịch</Typography>
             {/* tìm kiếm */}
             <Grid container xs={12} spacing={2}>
                 <Grid item xs={5}>
                     <TextField
-                        autoComplete="username"
                         variant="outlined"
                         fullWidth
                         name="title"
-                        label="email người dùng . . ."
+                        label="tiêu đề bài viết . . ."
                         type="text"
                         id="title"
-                        value={email}
-                        onChange={handleChangeEmail}
+                        value={title}
+                        onChange={handleChangeTitle}
                         onKeyDown={handleKeyDown}
                     />
                 </Grid>
-                <Grid item xs={2}>
+                <Grid item xs={7}>
                     <Button
-                        fullWidth
+                        // fullWidth
                         variant="contained"
                         color="primary"
                         className={classes.submit}
@@ -188,7 +187,7 @@ export default function Employee() {
 
             {/* bản thông tin */}
             {loading ? <p>Loading ...</p> :
-                <AppTable columns={columns} data={users} handleChoose={handleChooseUser} />
+                <AppTable columns={columns} data={news} handleChoose={handleChooseNews} />
             }
 
         </Container>

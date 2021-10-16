@@ -9,8 +9,9 @@ export let endpoints = {
     'customer':             'customer/',
     'employee':             'employee/',
 
-
     'address':              '/address/',
+    'tour':                 '/tour/',
+
     'news-tour':            '/news-tour/',
     'search-title':         'search-title/',
     'tour-detail':          '/tour/:id/',
