@@ -93,7 +93,7 @@ export default function NewsTourDetail() {
                 if (user.username != null)
                     await fetchCheckBooking()
             }
-            console.info(state?.newstour.rate)
+            // console.info(state?.newstour.rate)
         }
         init()
     }, [])

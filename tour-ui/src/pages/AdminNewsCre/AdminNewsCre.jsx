@@ -1,9 +1,7 @@
 import React, { createRef, useEffect, useState } from 'react';
 import {
-    makeStyles,
     Grid,
     Typography,
-    Divider,
     Container,
     Button,
     DialogTitle,
@@ -12,34 +10,14 @@ import {
     DialogActions,
     Dialog,
     TextField,
-    Accordion,
-    AccordionSummary,
-    AccordionDetails,
-    ListSubheader,
-    List,
-    ListItem,
-    ListItemText,
-    Box,
     CssBaseline,
-    FormControlLabel,
-    Checkbox,
-    Paper,
-    Table,
-    TableCell,
-    TableBody,
-    TableContainer,
-    TableHead,
-    TablePagination,
-    TableRow,
     Select,
     MenuItem,
     InputLabel,
     FormControl,
-    TextareaAutosize
 } from '@material-ui/core';
 import {
     MuiPickersUtilsProvider,
-    KeyboardTimePicker,
     KeyboardDatePicker,
 } from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
@@ -47,18 +25,28 @@ import { useStyles } from './AdminNewsCre-styles';
 import API, { endpoints } from '../../helpers/API';
 import useSubmitForm from '../../helpers/CustomHooks'
 import { useHistory } from 'react-router';
+import { useStore } from "react-redux";
+import cookies from 'react-cookies';
 import { ProtectRoutes } from '../../routes/protect-route';
 
 export default function CreateNews() {
     const classes = useStyles();
-    const avatar = createRef();
     const history = useHistory()
     const image = createRef();
+    const [open, setOpen] = useState(false);
     const [open1, setOpen1] = useState(false);
     const [tourChoosed, setTourChoosed] = useState([]);
     const [checkedTour, setCheckedTour] = useState(false);
     const [tours, setTours] = useState([]);
     const [loading, setLoading] = useState(false)
+
+    // lấy thông tin nhân viên
+    const store = useStore();
+    const auth = store.getState();
+    let user = auth;
+    if (cookies.load("user") != null) {
+        user = cookies.load("user")
+    };
 
 
     // lấy thời gian ngày hiện tại
@@ -71,7 +59,6 @@ export default function CreateNews() {
 
     useEffect(() => {
         async function init() {
-            // setLoading(true)
             await fetchTour()
         }
         init()
@@ -83,56 +70,66 @@ export default function CreateNews() {
             const _path = endpoints['tour']
             API.get(_path).then(res => {
                 setTours(res.data);
-                setLoading(false)
             })
+            setLoading(false)
         }, 500);
     }
 
     const create = async () => {
         const formData = new FormData();
 
-        // for (let k in inputs) {
-        //     if (k !== "confirm_password") formData.append(k, inputs[k]);
-        // }
+        for (let k in inputs) {
+            formData.append(k, inputs[k]);
+        }
 
-        formData.append("image", image.current.files[0]);
-        // formData.append("role", "NGUOI DUNG");
-        // nếu lưu ngày 10/10/2020 lỗi thì dùng tiếp hàm replace
-        formData.append("dateEnd", dateEnd.toLocaleDateString('en-GB'));
+        formData.append("static", "DANG MO");
+        formData.append("tour_id", tourChoosed.id);
+        formData.append("employee_id", user.id);
+        if (image.current.files.length != 0) {
+            formData.append("image", image.current.files[0]);
+        }
+        formData.append("dateEnd", dateEnd.toLocaleDateString('ko-KR').replace(". ", "-").replace(". ", "-").replace(".", ""));
 
         for (var key of formData.keys()) {
             console.log(key, formData.get(key));
         }
-        // console.info('date', date)
 
-        // try {
-        //     let res = await API.post(endpoints["user"], formData, {
-        //         headers: {
-        //             "Content-Type": "multipart/form-data",
-        //         },
-        //     });
-        //     console.info("res:", res)
-        //     if (res)
-        //         setOpen(true);
-        // } catch (err) {
-        //     console.log("ERROR:\n", err);
-        // }
+        try {
+            let res = await API.post(endpoints["news-tour"], formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+            console.info("res:", res)
+            if (res)
+                setOpen(true);
+        } catch (err) {
+            console.log("ERROR:\n", err);
+        }
     };
 
     const { inputs, handleInputChange, handleSubmit } = useSubmitForm(create);
 
-    // const handleCloseDialog = () => {
-    //     setOpen(false);
-    //     const _path = PublicRoutes.Login.path;
-    //     history.push(_path);
-    // };
+    // chọn nút quay về trên cửa số thông báo
+    const handleCloseDialog = () => {
+        setOpen(false);
+        const _path = ProtectRoutes.NewsTour.path;
+        history.push(_path);
+    };
 
+    // chọn nút tiếp tục trên cửa số thông báo
+    const handleContinue = () => {
+        setOpen(false);
+        window.location.reload();
+    };
+
+    // chọn tour để viết bài
     const handleChooseTour = (e) => {
         setTourChoosed(e.target.value);
         setCheckedTour(true)
     };
 
-    // đóng mở select address
+    // đóng mở select tour
     const handleClose1 = () => {
         setOpen1(false);
     };
@@ -140,6 +137,7 @@ export default function CreateNews() {
         setOpen1(true);
     };
 
+    // chọn nút quay lại
     const handleBack = () => {
         const _path = ProtectRoutes.NewsTour.path;
         history.push(_path);
@@ -164,6 +162,7 @@ export default function CreateNews() {
                                             fullWidth
                                             label="Tiêu đề bài viết"
                                             id="title"
+                                            name="title"
                                             value={inputs.title}
                                             onChange={handleInputChange}
                                         />
@@ -188,23 +187,23 @@ export default function CreateNews() {
                                         </MuiPickersUtilsProvider>
                                     </Grid>
 
-                                     {/* chọn ảnh */}
-                                     <Grid item xs={4}>
-                                            <input
-                                                accept="image/*"
-                                                className={classes.input}
-                                                id="contained-button-file"
-                                                multiple
-                                                type="file"
-                                                ref={image}
-                                            />
-                                            <label htmlFor="contained-button-file">
-                                                <Button variant="contained" color="primary"
-                                                    maxWidth component="span">
-                                                    chọn ảnh
-                                                </Button>
-                                            </label>
-                                        </Grid>
+                                    {/* chọn ảnh */}
+                                    <Grid item xs={4}>
+                                        <input
+                                            accept="image/*"
+                                            className={classes.input}
+                                            id="contained-button-file"
+                                            multiple
+                                            type="file"
+                                            ref={image}
+                                        />
+                                        <label htmlFor="contained-button-file">
+                                            <Button variant="contained" color="primary"
+                                                maxWidth component="span">
+                                                chọn ảnh
+                                            </Button>
+                                        </label>
+                                    </Grid>
 
                                     {/* mô tả */}
                                     <Grid item xs={12}>
@@ -216,6 +215,7 @@ export default function CreateNews() {
                                             minRows={15}
                                             multiline
                                             label="Mô tả bài viết"
+                                            name="descriptions"
                                             value={inputs.descriptions}
                                             onChange={handleInputChange}
                                         />
@@ -261,7 +261,7 @@ export default function CreateNews() {
                                                     variant="inline"
                                                     format="dd/MM/yyyy"
                                                     margin="normal"
-                                                    id="dateStart"
+                                                    id="tourChoosed-dateStart"
                                                     label="Ngày bắt đầu"
                                                     value={tourChoosed.dateStart}
                                                     readOnly
@@ -280,9 +280,9 @@ export default function CreateNews() {
                                                     variant="inline"
                                                     format="dd/MM/yyyy"
                                                     margin="normal"
-                                                    id="dateEnd"
+                                                    id="tourChoosed-dateEnd"
                                                     label="Ngày kết thúc"
-                                                    value={dateEnd}
+                                                    value={tourChoosed.dateEnd}
                                                     readOnly
                                                     KeyboardButtonProps={{
                                                         'aria-label': 'change date',
@@ -385,24 +385,29 @@ export default function CreateNews() {
                     </form>
                 </div>
             </Container>
-            {/* <Dialog
+
+            {/* xử lý sau khi tạo mới tin thành công */}
+            <Dialog
                 open={open}
                 onClose={handleCloseDialog}
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
             >
-                <DialogTitle id="alert-dialog-title">Bạn đã đăng ký thành công</DialogTitle>
+                <DialogTitle id="alert-dialog-title">Thông báo</DialogTitle>
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
-                        Vui lòng đăng nhập để tiếp tục dịch vụ
+                        Bạn đã tạo mới tin du lịch thành công
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleCloseDialog} color="primary" autoFocus>
-                        Đăng nhập
+                    <Button onClick={handleCloseDialog} autoFocus>
+                        Quay về
+                    </Button>
+                    <Button onClick={handleContinue} color="primary" autoFocus>
+                        Tiếp tục
                     </Button>
                 </DialogActions>
-            </Dialog> */}
+            </Dialog>
         </div>
     );
 }

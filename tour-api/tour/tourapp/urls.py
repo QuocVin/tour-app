@@ -29,6 +29,7 @@ router.register("news-tour", views.NewsTourViewSet)
 router.register("tour", views.TourViewSet)
 router.register("booking", views.BookingViewSet)
 router.register("address", views.AddressViewSet)
+router.register("type", views.TypeViewSet)
 
 
 urlpatterns = [

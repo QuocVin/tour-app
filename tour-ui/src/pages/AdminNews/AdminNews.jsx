@@ -129,13 +129,16 @@ export default function AdminNews() {
         }
     };
 
+    // chọn bài viết
     const handleChooseNews = (newsId) => {
         const _pathAPI = endpoints['news-tour'] + `${newsId}/`;
         API.get(_pathAPI).then(res => {
             const _pathPage = ProtectRoutes.NewsTourDetail.path.replace(":id", newsId)
             history.push(_pathPage, {
-                news: res.data[0],
+                newsId: res.data.id,
+                tourId: res.data.tour,
             })
+            console.info('data', res.data.tour)
         })
     }
 

@@ -1,4 +1,4 @@
-import React, { createRef, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Grid,
     Typography,
@@ -14,7 +14,7 @@ import {
 } from '@material-ui/pickers';
 import MuiAlert from '@material-ui/lab/Alert';
 import DateFnsUtils from '@date-io/date-fns';
-import { useStyles } from './AdminNewsDetail-styles';
+import { useStyles } from './AdminTourDetail-styles';
 import API, { endpoints } from '../../helpers/API';
 import useSubmitForm from '../../helpers/CustomHooks'
 import { useHistory, useLocation } from 'react-router';
@@ -24,92 +24,70 @@ function Alert(props) {
     return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
-export default function NewsDetail() {
+export default function CreateTour(props) {
     const classes = useStyles();
     const history = useHistory()
-    const image = createRef();
     const { state } = useLocation();
-
-    const [tour, setTour] = useState([]);
-    const [type, setType] = useState();
-    const [address1, setAddress1] = useState();
-    const [address2, setAddress2] = useState();
-
-    const [news, setNews] = useState([]);
-    const [descriptions, setDescriptions] = useState('');
-    const hanleChangeDes = (e) => {
-        setDescriptions(e.target.value);
-    }
 
     const [open, setOpen] = useState(false);
     const [open2, setOpen2] = useState(false);
     const [loading, setLoading] = useState(false)
 
+    const [tour, setTour] = useState([]);
+    const [typeTour, setTypeTour] = useState();
+    const [address1, setAddress1] = useState();
+    const [address2, setAddress2] = useState();
+    const [descriptions, setDescriptions] = useState('');
+    const hanleChangeDes = (e) => {
+        setDescriptions(e.target.value);
+    }
+
     // lấy thời gian ngày hiện tại
-    const [check, setCheck] = useState(false);
     const current = new Date();
     const date = `${current.getFullYear()}-${current.getMonth() + 1}-${current.getDate()}`
+    const [dateStart, setDateStart] = useState(new Date(date));
     const [dateEnd, setDateEnd] = useState(new Date(date));
-    const handleDateEnd = (date) => {
-        setDateEnd(date);
-        setCheck(true)
-    };
 
     useEffect(() => {
         async function init() {
-            await fetchNews()
-            await fetchTourInNews()
+            setLoading(true)
+            await fetchTour()
         }
         init()
     }, [])
 
-    const fetchNews = async () => {
-        setTimeout(() => {
-            setLoading(true)
-            const _path = endpoints['news-tour'] + `${state?.newsId}/`
-            API.get(_path).then(res => {
-                setNews(res.data);
-                setDateEnd(res.data.dateEnd)
-                setDescriptions(res.data.descriptions)
-            })
-        }, 500);
-    }
-
-    const fetchTourInNews = async () => {
+    // lấy dữ liệu tour đã chọn
+    const fetchTour = async () => {
         setTimeout(() => {
             const _path = endpoints['tour'] + `${state?.tourId}/`
             API.get(_path).then(res => {
                 setTour(res.data);
-                setType(res.data.type[0].name)
+                setTypeTour(res.data.type[0].name)
                 setAddress1(res.data.address[0].name)
                 setAddress2(res.data.address[1].name)
+                setDateStart(res.data.dateStart)
+                setDateEnd(res.data.dateEnd)
+                setDescriptions(res.data.descriptions)
             })
             setLoading(false)
         }, 500);
     }
 
+    // api post tạo mới tour
     const changeInfo = async () => {
         const formData = new FormData();
 
-        for (let k in inputs) {
-            formData.append(k, inputs[k]);
-        }
-        formData.append("descriptions", descriptions);
         formData.append("static", "DANG MO");
-        if (image.current.files.length != 0) {
-            formData.append("image", image.current.files[0]);
-        }
-
-        if (check) {
-            formData.append("dateEnd", dateEnd.toLocaleDateString('ko-KR').replace(". ", "-").replace(". ", "-").replace(".", ""));
-        }
+        formData.append("descriptions", descriptions);
+        if (inputs.title)
+            formData.append("title", inputs.title);
 
         for (var key of formData.keys()) {
             console.log(key, formData.get(key));
         }
 
         try {
-            const _path = endpoints["news-tour"] + `${state?.newsId}/`
+            const _path = endpoints["tour"] + `${state?.tourId}/`
             let res = await API.patch(_path, formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
@@ -124,17 +102,16 @@ export default function NewsDetail() {
     };
 
     // đóng bài viết
-    const closeNews = async () => {
+    const closeTour = async () => {
         const formData = new FormData();
         formData.append("static", "DA DONG");
         try {
-            const _path = endpoints["news-tour"] + `${state?.newsId}/`
+            const _path = endpoints["tour"] + `${state?.tourId}/`
             let res = await API.patch(_path, formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
             });
-            console.info("res:", res)
             if (res)
                 setOpen2(true);
         } catch (err) {
@@ -144,14 +121,15 @@ export default function NewsDetail() {
 
     const { inputs, handleInputChange, handleSubmit } = useSubmitForm(changeInfo);
 
-    // chọn nút quay lại
+    // chọn nút quay về
     const handleBack = () => {
-        const _path = ProtectRoutes.NewsTour.path;
+        const _path = ProtectRoutes.Tour.path;
         history.push(_path);
     };
 
-    const handleCloseNews = () => {
-        closeNews();
+    // chọn nút đóng tour
+    const handleCloseTour = () => {
+        closeTour();
     };
 
     // xử lý sau khi hiện thông báo
@@ -166,20 +144,20 @@ export default function NewsDetail() {
             <Container component="main" maxWidth="lg">
                 <CssBaseline />
                 <div className={classes.paper}>
-                    <Typography variant="h3">Thông tin bài viết</Typography>
+                    <Typography variant="h3">Thông tin tour du lịch</Typography>
                     <form className={classes.form} onSubmit={handleSubmit}>
                         {loading ? <p>loading. . .</p> :
                             <Grid container spacing={2}>
-                                {/* các thông tin về bài viết */}
-                                <Grid item xs={8}  >
+                                {/* các thông tin về tour */}
+                                <Grid item xs={5}  >
                                     <Grid container xs={12} spacing={2}>
                                         {/* tiêu đề */}
-                                        <Typography variant="body">Tiêu đề bài viết</Typography>
                                         <Grid item xs={12}>
+                                            <Typography variant="body">Tiêu đề bài viết</Typography>
                                             <TextField
                                                 variant="outlined"
                                                 fullWidth
-                                                label={news.title}
+                                                label={tour.title}
                                                 id="title"
                                                 name="title"
                                                 value={inputs.title}
@@ -187,102 +165,29 @@ export default function NewsDetail() {
                                             />
                                         </Grid>
 
-                                        {/* trạng thái bài viêt */}
-                                        <Grid item xs={12} spacing={2}>
-                                            <Typography variant="body">Trạng thái bài viết</Typography>
-                                            <Grid item xs={4} spacing={2}>
-                                                <TextField
-                                                    variant="outlined"
-                                                    fullWidth
-                                                    readOnly
-                                                    id="title"
-                                                    name="title"
-                                                    value={news.static}
-                                                />
-                                            </Grid>
-                                        </Grid>
-
-                                        {/* ngày kết thúc */}
-                                        <Grid item xs={4}>
-                                            <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                                                <KeyboardDatePicker
-                                                    disableToolbar
-                                                    variant="inline"
-                                                    format="dd/MM/yyyy"
-                                                    margin="normal"
-                                                    id="dateEnd"
-                                                    label="Ngày kết thúc"
-                                                    value={dateEnd}
-                                                    onChange={handleDateEnd}
-                                                    KeyboardButtonProps={{
-                                                        'aria-label': 'change date',
-                                                    }}
-                                                />
-                                            </MuiPickersUtilsProvider>
-                                        </Grid>
-
-                                        {/* chọn ảnh */}
-                                        <Grid item xs={4}>
-                                            <input
-                                                accept="image/*"
-                                                className={classes.input}
-                                                id="contained-button-file"
-                                                multiple
-                                                type="file"
-                                                ref={image}
-                                            />
-                                            <label htmlFor="contained-button-file">
-                                                <Button variant="contained" color="primary"
-                                                    maxWidth component="span">
-                                                    chọn ảnh
-                                                </Button>
-                                            </label>
-                                        </Grid>
-
-                                        {/* mô tả */}
-                                        <Grid item xs={12}>
-                                            <Typography variant="body">Mô tả bài viết</Typography>
-                                            <TextField
-                                                variant="outlined"
-                                                fullWidth
-                                                id="descriptions"
-                                                minRows={15}
-                                                multiline
-                                                value={descriptions}
-                                                onChange={hanleChangeDes}
-                                            />
-                                        </Grid>
-                                    </Grid>
-                                </Grid>
-
-                                {/* các thông tin về tour trong bài */}
-                                <Grid item xs={4}>
-                                    <Grid container xs={12} spacing={2}>
-                                        <Typography variant="h5">Thông tin tour trong bài viết</Typography>
-                                        {/* chọn tour để viết bài */}
-                                        <Grid item xs={12} >
+                                        {/* type - không cho thay đổi */}
+                                        <Grid item xs={7}>
+                                            <Typography variant="body">Hình thức du lịch</Typography>
                                             <TextField
                                                 variant="outlined"
                                                 fullWidth
                                                 readOnly
-                                                label="Tiêu đề tour"
-                                                value={tour.title + ''}
+                                                value={typeTour}
                                             />
                                         </Grid>
 
-                                        {/* hình thức */}
-                                        <Grid item xs={8} >
+                                        {/* static - thay đổi qua cập nhập */}
+                                        <Grid item xs={5}>
+                                            <Typography variant="body">Trạng thái</Typography>
                                             <TextField
                                                 variant="outlined"
                                                 fullWidth
                                                 readOnly
-                                                label="Hình thức"
-                                                value={type + ''}
+                                                value={tour.static}
                                             />
                                         </Grid>
-                                    </Grid>
-                                    <Grid container xs={12} spacing={2}>
-                                        {/* ngày bắt đầu */}
+
+                                        {/* ngày bắt đầu - không cho thay đổi */}
                                         <Grid item xs={6}>
                                             <MuiPickersUtilsProvider utils={DateFnsUtils}>
                                                 <KeyboardDatePicker
@@ -292,7 +197,7 @@ export default function NewsDetail() {
                                                     margin="normal"
                                                     id="dateStart"
                                                     label="Ngày bắt đầu"
-                                                    value={tour.dateStart}
+                                                    value={dateStart}
                                                     readOnly
                                                     KeyboardButtonProps={{
                                                         'aria-label': 'change date',
@@ -301,7 +206,7 @@ export default function NewsDetail() {
                                             </MuiPickersUtilsProvider>
                                         </Grid>
 
-                                        {/* ngày kết thúc */}
+                                        {/* ngày kết thúc - không cho thay đổi */}
                                         <Grid item xs={6}>
                                             <MuiPickersUtilsProvider utils={DateFnsUtils}>
                                                 <KeyboardDatePicker
@@ -311,7 +216,7 @@ export default function NewsDetail() {
                                                     margin="normal"
                                                     id="dateEnd"
                                                     label="Ngày kết thúc"
-                                                    value={tour.dateEnd}
+                                                    value={dateEnd}
                                                     readOnly
                                                     KeyboardButtonProps={{
                                                         'aria-label': 'change date',
@@ -320,64 +225,64 @@ export default function NewsDetail() {
                                             </MuiPickersUtilsProvider>
                                         </Grid>
 
-                                        {/* mô tả */}
-                                        <Grid item xs={12}>
-                                            <TextField
-                                                variant="outlined"
-                                                fullWidth
-                                                readOnly
-                                                minRows={8}
-                                                multiline
-                                                label="Mô tả"
-                                                value={tour.descriptions + ''}
-                                            />
-                                        </Grid>
-
-                                        {/* điểm xuất phát */}
-                                        <Grid item xs={6} >
-                                            <TextField
-                                                variant="outlined"
-                                                fullWidth
-                                                id="pointStart"
-                                                label="Điểm xuất phát"
-                                                readOnly
-                                                value={address1 + ''}
-                                            />
-                                        </Grid>
-
-                                        {/* điểm đến */}
-                                        <Grid item xs={6} >
-                                            <TextField
-                                                variant="outlined"
-                                                fullWidth
-                                                id="pointEnd"
-                                                label="Điểm đến"
-                                                readOnly
-                                                value={address2 + ''}
-                                            />
-                                        </Grid>
-
-                                        {/* giá vé */}
+                                        {/* giá vé - không cho thay đổi */}
                                         <Grid item xs={6}>
+                                            <Typography variant="body">Giá vé cho người lớn</Typography>
                                             <TextField
                                                 variant="outlined"
                                                 fullWidth
-                                                id="price1"
                                                 readOnly
-                                                label="Giá vé cho người lớn"
                                                 value={tour.price1 + ' VNĐ'}
                                             />
                                         </Grid>
                                         <Grid item xs={6}>
+                                            <Typography variant="body">Giá vé cho trẻ em</Typography>
                                             <TextField
                                                 variant="outlined"
                                                 fullWidth
-                                                id="price2"
-                                                label="Giá vé cho trẻ em"
                                                 readOnly
-                                                value={tour.price2 + ' VNĐ'}
+                                                value={tour.price2 + " VNĐ"}
                                             />
                                         </Grid>
+
+                                        {/* điểm xuất phát - không cho thay đổi */}
+                                        <Grid item xs={6} >
+                                            <Typography variant="body">Điểm xuất phát</Typography>
+                                            <TextField
+                                                variant="outlined"
+                                                fullWidth
+                                                readOnly
+                                                value={address1}
+                                            />
+                                        </Grid>
+
+                                        {/* điểm đến - không cho thay đổi */}
+                                        <Grid item xs={6} >
+                                            <Typography variant="body">Điểm đến</Typography>
+                                            <TextField
+                                                variant="outlined"
+                                                fullWidth
+                                                readOnly
+                                                value={address2}
+                                            />
+                                        </Grid>
+                                    </Grid>
+                                </Grid>
+
+                                {/* mô tả chi tiết */}
+                                <Grid item xs={7}>
+                                    <Grid container xs={12} spacing={2}>
+                                        <Typography variant="body">Mô tả bài viết</Typography>
+                                        <TextField
+                                            variant="outlined"
+                                            fullWidth
+                                            id="descriptions"
+                                            name="descriptions"
+                                            value={descriptions}
+                                            onChange={hanleChangeDes}
+                                            minRows={21}
+                                            multiline
+                                        />
                                     </Grid>
                                 </Grid>
                             </Grid>
@@ -402,9 +307,9 @@ export default function NewsDetail() {
                                     variant="contained"
                                     color="primary"
                                     className={classes.submit}
-                                    onClick={handleCloseNews}
+                                    onClick={handleCloseTour}
                                 >
-                                    Đóng bài viết
+                                    Đóng tour
                                 </Button>
                             </Grid>
                             <Grid item xs={6}>
@@ -431,7 +336,7 @@ export default function NewsDetail() {
             </Snackbar>
             <Snackbar open={open2} autoHideDuration={6000} onClose={handleCloseAlert}>
                 <Alert onClose={handleCloseAlert} severity="warning">
-                    Bạn đã đóng bài viết
+                    Bạn đã đóng tour
                 </Alert>
             </Snackbar>
         </div>

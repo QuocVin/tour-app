@@ -1,9 +1,7 @@
-import React, { createRef, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-    makeStyles,
     Grid,
     Typography,
-    Divider,
     Container,
     Button,
     DialogTitle,
@@ -12,34 +10,14 @@ import {
     DialogActions,
     Dialog,
     TextField,
-    Accordion,
-    AccordionSummary,
-    AccordionDetails,
-    ListSubheader,
-    List,
-    ListItem,
-    ListItemText,
-    Box,
     CssBaseline,
-    FormControlLabel,
-    Checkbox,
-    Paper,
-    Table,
-    TableCell,
-    TableBody,
-    TableContainer,
-    TableHead,
-    TablePagination,
-    TableRow,
     Select,
     MenuItem,
     InputLabel,
     FormControl,
-    TextareaAutosize
 } from '@material-ui/core';
 import {
     MuiPickersUtilsProvider,
-    KeyboardTimePicker,
     KeyboardDatePicker,
 } from '@material-ui/pickers';
 import DateFnsUtils from '@date-io/date-fns';
@@ -51,12 +29,13 @@ import { ProtectRoutes } from '../../routes/protect-route';
 
 export default function CreateTour(props) {
     const classes = useStyles();
-    const avatar = createRef();
     const history = useHistory()
     const [open, setOpen] = useState(false);
     const [open1, setOpen1] = useState(false);
     const [open2, setOpen2] = useState(false);
+    const [open3, setOpen3] = useState(false);
     const [address, setAddress] = useState([]);
+    const [type, setType] = useState([]);
     const [loading, setLoading] = useState(false)
 
 
@@ -70,10 +49,12 @@ export default function CreateTour(props) {
         async function init() {
             // setLoading(true)
             await fetchAddress()
+            await fetchType()
         }
         init()
     }, [])
 
+    // lấy dữ liệu về address
     const fetchAddress = async () => {
         setLoading(true)
         setTimeout(() => {
@@ -85,6 +66,19 @@ export default function CreateTour(props) {
         }, 500);
     }
 
+    // lấy dữ liệu về type
+    const fetchType = async () => {
+        setLoading(true)
+        setTimeout(() => {
+            const _path = endpoints['type']
+            API.get(_path).then(res => {
+                setType(res.data);
+                setLoading(false)
+            })
+        }, 500);
+    }
+
+    // xử lý lấy dữ liệu date
     const handleDateStart = (date) => {
         setDateStart(date);
     };
@@ -92,44 +86,84 @@ export default function CreateTour(props) {
         setDateEnd(date);
     };
 
+    // const createType = async () => {
+    //     const formData = new FormData();
+    //     formData.append("type", inputs["type"]);
+    //     try {
+    //         let res = await API.post(endpoints["type"], formData, {
+    //             headers: {
+    //                 "Content-Type": "multipart/form-data",
+    //             },
+    //         });
+    //     } catch (err) {
+    //         console.log("ERROR:\n", err);
+    //     }
+    // };
+
+    // const createAddress = async (value) => {
+    //     const formData = new FormData();
+    //     formData.append("type", inputs["type"]);
+    //     try {
+    //         let res = await API.post(endpoints["type"], formData, {
+    //             headers: {
+    //                 "Content-Type": "multipart/form-data",
+    //             },
+    //         });
+    //     } catch (err) {
+    //         console.log("ERROR:\n", err);
+    //     }
+    // };
+
+    // api post tạo mới tour
     const create = async () => {
         const formData = new FormData();
+        let type1 = [inputs["type"]]
+        let address3 = [
+            inputs["address1"], inputs["address2"]
+        ]
+        formData.append("type", type1);
+        formData.append("address", address3);
 
-        for (let k in inputs) {
-            formData.append(k, inputs[k]);
-        }
+        formData.append("static", "DANG MO");
+        formData.append("descriptions", inputs["descriptions"]);
+        formData.append("title", inputs["title"]);
+        formData.append("price1", inputs["price1"]);
+        formData.append("price2", inputs["price2"]);
 
-        // formData.append("role", "NGUOI DUNG");
-        // nếu lưu ngày 10/10/2020 lỗi thì dùng tiếp hàm replace
-        formData.append("dateStart", dateStart.toLocaleDateString('en-GB'));
-        formData.append("dateEnd", dateEnd.toLocaleDateString('en-GB'));
+        formData.append("dateStart", dateEnd.toLocaleDateString('ko-KR').replace(". ", "-").replace(". ", "-").replace(".", ""));
+        formData.append("dateEnd", dateEnd.toLocaleDateString('ko-KR').replace(". ", "-").replace(". ", "-").replace(".", ""));
 
         for (var key of formData.keys()) {
             console.log(key, formData.get(key));
         }
-        // console.info('date', date)
 
-        // try {
-        //     let res = await API.post(endpoints["user"], formData, {
-        //         headers: {
-        //             "Content-Type": "multipart/form-data",
-        //         },
-        //     });
-        //     console.info("res:", res)
-        //     if (res)
-        //         setOpen(true);
-        // } catch (err) {
-        //     console.log("ERROR:\n", err);
-        // }
+        try {
+            let res = await API.post(endpoints["tour"], formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+            if (res)
+                setOpen(true);
+        } catch (err) {
+            console.log("ERROR:\n", err);
+        }
     };
 
     const { inputs, handleInputChange, handleSubmit } = useSubmitForm(create);
 
-    // const handleCloseDialog = () => {
-    //     setOpen(false);
-    //     const _path = PublicRoutes.Login.path;
-    //     history.push(_path);
-    // };
+    // chọn nút quay về trên cửa số thông báo
+    const handleCloseDialog = () => {
+        setOpen(false);
+        const _path = ProtectRoutes.Tour.path;
+        history.push(_path);
+    };
+
+    // chọn nút tiếp tục trên cửa số thông báo
+    const handleContinue = () => {
+        setOpen(false);
+        window.location.reload();
+    };
 
     // đóng mở select address
     const handleClose1 = () => {
@@ -144,7 +178,14 @@ export default function CreateTour(props) {
     const handleOpen2 = () => {
         setOpen2(true);
     };
+    const handleClose3 = () => {
+        setOpen3(false);
+    };
+    const handleOpen3 = () => {
+        setOpen3(true);
+    };
 
+    // nhấn nút quay về
     const handleBack = () => {
         const _path = ProtectRoutes.Tour.path;
         history.push(_path);
@@ -173,6 +214,30 @@ export default function CreateTour(props) {
                                             value={inputs.title}
                                             onChange={handleInputChange}
                                         />
+                                    </Grid>
+
+                                    {/* type */}
+                                    <Grid item xs={7}>
+                                        <FormControl className={classes.formControl}>
+                                            <InputLabel id="type-label">Hình thức</InputLabel>
+                                            <Select
+                                                labelId="type-label"
+                                                id="type"
+                                                name="type"
+                                                open={open3}
+                                                onClose={handleClose3}
+                                                onOpen={handleOpen3}
+                                                value={inputs.type}
+                                                onChange={handleInputChange}
+                                            >
+                                                <MenuItem value="">
+                                                    <em>None</em>
+                                                </MenuItem>
+                                                {type.map((a, idx) =>
+                                                    <MenuItem value={a.id} key={idx}>{a.name}</MenuItem>
+                                                )}
+                                            </Select>
+                                        </FormControl>
                                     </Grid>
 
                                     {/* ngày bắt đầu */}
@@ -233,6 +298,7 @@ export default function CreateTour(props) {
                                             required
                                             fullWidth
                                             id="price2"
+                                            name="price2"
                                             label="Giá vé cho trẻ em"
                                             type="number"
                                             value={inputs.price2}
@@ -247,6 +313,7 @@ export default function CreateTour(props) {
                                             <Select
                                                 labelId="address1-label"
                                                 id="address1"
+                                                name="address1"
                                                 open={open1}
                                                 onClose={handleClose1}
                                                 onOpen={handleOpen1}
@@ -270,6 +337,7 @@ export default function CreateTour(props) {
                                             <Select
                                                 labelId="address2-label"
                                                 id="address2"
+                                                name="address2"
                                                 open={open2}
                                                 onClose={handleClose2}
                                                 onOpen={handleOpen2}
@@ -297,6 +365,7 @@ export default function CreateTour(props) {
                                         required
                                         fullWidth
                                         id="descriptions"
+                                        name="descriptions"
                                         label="Mô tả chi tiết"
                                         value={inputs.descriptions}
                                         onChange={handleInputChange}
@@ -334,24 +403,29 @@ export default function CreateTour(props) {
                     </form>
                 </div>
             </Container>
-            {/* <Dialog
+
+            {/* xử lý sau khi tạo mới tin thành công */}
+            <Dialog
                 open={open}
                 onClose={handleCloseDialog}
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
             >
-                <DialogTitle id="alert-dialog-title">Bạn đã đăng ký thành công</DialogTitle>
+                <DialogTitle id="alert-dialog-title">Thông báo</DialogTitle>
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
-                        Vui lòng đăng nhập để tiếp tục dịch vụ
+                        Bạn đã tạo mới tour du lịch thành công
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleCloseDialog} color="primary" autoFocus>
-                        Đăng nhập
+                    <Button onClick={handleCloseDialog} autoFocus>
+                        Quay về
+                    </Button>
+                    <Button onClick={handleContinue} color="primary" autoFocus>
+                        Tiếp tục
                     </Button>
                 </DialogActions>
-            </Dialog> */}
+            </Dialog>
         </div>
     );
 }

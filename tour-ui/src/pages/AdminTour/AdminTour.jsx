@@ -1,44 +1,14 @@
-import React, { createRef, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-    makeStyles,
     Grid,
     Typography,
-    Divider,
     Container,
     Button,
-    DialogTitle,
-    DialogContentText,
-    DialogContent,
-    DialogActions,
-    Dialog,
     TextField,
-    Accordion,
-    AccordionSummary,
-    AccordionDetails,
-    ListSubheader,
-    List,
-    ListItem,
-    ListItemText,
-    Box,
-    CssBaseline,
-    FormControlLabel,
-    Checkbox,
-    Paper,
-    Table,
-    TableCell,
-    TableBody,
-    TableContainer,
-    TableHead,
-    TablePagination,
-    TableRow,
 } from '@material-ui/core';
-import useSubmitForm from '../../helpers/CustomHooks'
 import API, { endpoints } from '../../helpers/API';
 import { useStyles } from './AdminTour-styles';
-import { useStore } from "react-redux";
-import cookies from 'react-cookies';
 import { useHistory } from 'react-router';
-import Pagination from '@material-ui/lab/Pagination';
 import AppTable from '../../components/Table';
 import SearchIcon from '@material-ui/icons/Search';
 import { ProtectRoutes } from '../../routes/protect-route';
@@ -96,8 +66,8 @@ const columns = [
     },
 ];
 
-function createData(stt, title, dateStart, dateEnd, price1, price2, pointStart, pointEnd, static1) {
-    return { stt, title, dateStart, dateEnd, price1, price2, pointStart, pointEnd, static1 };
+function createData(stt, title, dateStart, dateEnd, price1, price2, pointStart, pointEnd, static1, userId) {
+    return { stt, title, dateStart, dateEnd, price1, price2, pointStart, pointEnd, static1, userId };
 }
 
 export default function AdminTour() {
@@ -116,6 +86,7 @@ export default function AdminTour() {
         init()
     }, [])
 
+    // lấy danh sách tour
     const fetchTour = async () => {
         setLoading(true)
         setTimeout(() => {
@@ -124,7 +95,7 @@ export default function AdminTour() {
                 setTour(
                     res.data.map((b, idx) =>
                         createData(idx + 1, b.title, b.dateStart, b.dateEnd, b.price1 + ' VNĐ'
-                            , b.price2 + ' VNĐ', b.address[0].name, b.address[1].name, b.static)
+                            , b.price2 + ' VNĐ', b.address[0].name, b.address[1].name, b.static, b.id)
                     )
                 );
                 setLoading(false)
@@ -132,29 +103,30 @@ export default function AdminTour() {
         }, 500);
     }
 
+    // tìm kiếm bằng title
     const handleChangeTitle = (e) => {
         setTitle(e.target.value)
     };
-
     const handleSearch = () => {
         fetchTour()
     };
 
+    // xử lý nút enter khi tìm
     const handleKeyDown = (e) => {
         if (e.key === "Enter") {
             handleSearch();
         }
     };
 
-    const handleChooseTour = (userId) => {
-        // const _pathAPI = endpoints['user'] + endpoints['employee'] + `?id=${userId}`;
-        // API.get(_pathAPI).then(res => {
-        //     const _pathPage = ProtectRoutes.EmployeeDetail.path.replace(":id", userId)
-        //     history.push(_pathPage, {
-        //         user: res.data[0],
-        //     })
-        // })
-        console.info('choose')
+    // chọn tour trong danh sách
+    const handleChooseTour = (tourId) => {
+        const _pathAPI = endpoints['tour'] + `${tourId}/`;
+        API.get(_pathAPI).then(res => {
+            const _pathPage = ProtectRoutes.TourDetail.path.replace(":id", tourId)
+            history.push(_pathPage, {
+                tourId: res.data.id,
+            })
+        })
     }
 
     // chọn nút tạo mới
@@ -208,9 +180,6 @@ export default function AdminTour() {
             {loading ? <p>Loading ...</p> :
                 <AppTable columns={columns} data={tour} handleChoose={handleChooseTour} />
             }
-
         </Container>
-
-
     );
 }

@@ -39,7 +39,6 @@ import { useStore } from "react-redux";
 import cookies from 'react-cookies';
 import { useHistory } from 'react-router';
 import { PublicRoutes } from '../../routes/public-route';
-import Pagination from '@material-ui/lab/Pagination';
 
 const columns = [
     { id: 'stt', label: 'STT', maxWidth: 20, align: 'center', },

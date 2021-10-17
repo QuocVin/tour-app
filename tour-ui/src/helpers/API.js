@@ -11,6 +11,7 @@ export let endpoints = {
     'current-employee':     'current-employee/',
 
     'address':              '/address/',
+    'type':                 '/type/',
     'tour':                 '/tour/',
 
     'news-tour':            '/news-tour/',

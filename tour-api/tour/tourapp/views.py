@@ -173,14 +173,33 @@ class NewsTourViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.ListAPI
                         status.HTTP_400_BAD_REQUEST)
 
 
-class TourViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.ListAPIView, generics.RetrieveAPIView):
+class TourViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.ListAPIView, generics.RetrieveAPIView, generics.UpdateAPIView):
     queryset = Tour.objects.all()
     serializer_class = TourSerializer
+
+    def create(self, request, *args, **kwargs):
+
+        tour = Tour(title=request.data.get('title'), descriptions=request.data.get('descriptions'),
+                    price1=request.data.get('price1'), price2=request.data.get('price2'),
+                    dateStart=request.data.get('dateStart'), dateEnd=request.data.get('dateEnd'),
+                    static=request.data.get('static'))
+        tour.save()
+        tour.type.add(request.data.get('type'))
+        for a in request.data.get('address'):
+            if a != ',':
+                tour.address.add(a)
+
+        return Response(status=status.HTTP_200_OK)
 
 
 class AddressViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.ListAPIView, generics.RetrieveAPIView):
     queryset = Address.objects.all()
     serializer_class = AddressSerializer
+
+
+class TypeViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.ListAPIView, generics.RetrieveAPIView):
+    queryset = Type.objects.all()
+    serializer_class = TypeSerializer
 
 
 class BookingViewSet(viewsets.ViewSet, generics.CreateAPIView,

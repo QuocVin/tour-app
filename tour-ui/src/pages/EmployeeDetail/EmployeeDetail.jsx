@@ -173,7 +173,7 @@ export default function InfoCustomer() {
     const { inputs, handleInputChange, handleSubmit } = useSubmitForm(create);
 
     const handleBlack = () => {
-        const _path = ProtectRoutes.Customer.path;
+        const _path = ProtectRoutes.Employee.path;
         history.push(_path);
     };
 
