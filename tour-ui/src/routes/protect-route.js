@@ -14,7 +14,7 @@ import ManageTourNewPage from "../pages/AdminTourNew";
 
 import ManageNewsPage from "../pages/AdminNews";
 import ManageNewsCrePage from "../pages/AdminNewsCre";
-
+import NewsTourDetailPage from "../pages/AdminNewsDetail";
 
 
 
@@ -35,9 +35,10 @@ export const ProtectRouteNames = {
 
     Tour: 'Tour',
     TourNew: 'TourNew',
-    
+
     NewsTour: 'NewsTour',
     NewsTourCre: 'NewsTourCre',
+    NewsTourDetail: 'NewsTourDetail',
 
 }
 
@@ -59,6 +60,7 @@ export const AdminPaths = {
 
     NewsTour: ['', ProtectRouteNames.NewsTour].join('/'),
     NewsTourCre: ['', ProtectRouteNames.NewsTourCre, NEDRoutes.New].join('/'),
+    NewsTourDetail: ['', ProtectRouteNames.NewsTourDetail, NEDRoutes.Detail].join('/'),
 
 }
 
@@ -79,6 +81,14 @@ export const ProtectRoutes = {
         component: CustomerPage,
         icon: HomeIcon
     },
+    CustomerNew: {
+        exact: true,
+        id: ProtectRouteNames.CustomerNew,
+        label: "Customer new",
+        path: AdminPaths.CustomerNew,
+        component: CreateCusPage,
+        icon: HomeIcon
+    },
     CustomerDetail: {
         exact: true,
         id: ProtectRouteNames.CustomerDetail,
@@ -87,14 +97,6 @@ export const ProtectRoutes = {
         component: InfoCusPage,
         icon: HomeIcon
     },
-    // CustomerNew: {
-    //     exact: true,
-    //     id: ProtectRouteNames.CustomerNew,
-    //     label: "Customer new",
-    //     path: AdminPaths.CustomerNew,
-    //     component: DashboardPage,
-    //     icon: HomeIcon
-    // },
     Employee: {
         exact: true,
         id: ProtectRouteNames.Employee,
@@ -150,6 +152,14 @@ export const ProtectRoutes = {
         label: "NewsTourCre",
         path: AdminPaths.NewsTourCre,
         component: ManageNewsCrePage,
+        icon: HomeIcon
+    },
+    NewsTourDetail: {
+        exact: true,
+        id: ProtectRouteNames.NewsTourDetail,
+        label: "NewsTourDetail",
+        path: AdminPaths.NewsTourDetail,
+        component: NewsTourDetailPage,
         icon: HomeIcon
     },
 }

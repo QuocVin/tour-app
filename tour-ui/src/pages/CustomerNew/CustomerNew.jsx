@@ -3,11 +3,7 @@ import {
     Button,
     CssBaseline,
     TextField,
-    FormControlLabel,
-    Checkbox,
-    Link,
     Grid,
-    Box,
     Typography,
     Container,
     Dialog,
@@ -15,14 +11,19 @@ import {
     DialogContent,
     DialogContentText,
     DialogTitle,
+    Snackbar,
 } from '@material-ui/core';
+import MuiAlert from '@material-ui/lab/Alert';
 import { useStyles } from './CustomerNew-styles';
 import API, { endpoints } from '../../helpers/API';
 import useSubmitForm from '../../helpers/CustomHooks'
-import { useHistory, useLocation } from 'react-router';
+import { useHistory } from 'react-router';
 import { ProtectRoutes } from '../../routes/protect-route';
-import { PublicRoutes } from '../../routes/public-route';
-import AppTable from '../../components/Table';
+
+function Alert(props) {
+    return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
+
 
 export default function CreateCustomer() {
     const classes = useStyles();
@@ -30,25 +31,9 @@ export default function CreateCustomer() {
     const history = useHistory()
 
     const [open, setOpen] = useState(false);
-    const [loading, setLoading] = useState(false)
+    const [openError, setOpenError] = useState(false);
 
-    const [booKing, setBooking] = useState([]);
-
-    // useEffect(() => {
-    //     async function init() {
-    //         if (state) {
-    //             setCheckUser(true)
-    //         }
-    //         else {
-    //             setCheckUser(false)
-    //             console.info('state', 'khong co')
-    //         }
-    //         setLoading(true)
-    //         await fetchBooking()
-    //     }
-    //     init()
-    // }, [])
-
+    // api post tạo mới người dùng
     const create = async () => {
         const formData = new FormData();
 
@@ -56,9 +41,12 @@ export default function CreateCustomer() {
             for (let k in inputs) {
                 if (k !== "confirm_password") formData.append(k, inputs[k]);
             }
-        }
+        } else
+            setOpenError(true)
 
-        formData.append("avatar", avatar.current.files[0]);
+        if (avatar.current.files.length != 0) {
+            formData.append("avatar", avatar.current.files[0]);
+        }
         formData.append("role", "NGUOI DUNG");
 
         for (var key of formData.keys()) {
@@ -85,11 +73,27 @@ export default function CreateCustomer() {
         history.push(_path);
     };
 
+     // xử lý sau khi thực hiện tạo người dùng thành công
+     const handleCloseDialog = () => {
+        setOpen(false);
+        const _path = ProtectRoutes.Customer.path;
+        history.push(_path);
+    };
+    const handleContinue = () => {
+        setOpen(false);
+        window.location.reload();
+    };
+
+    // xử lý sau khi hiện thông báo
+    const handleCloseAlert = () => {
+        setOpenError(false);
+    };
+
     return (
         <Container maxWidth='lg'>
             <CssBaseline />
             <div className={classes.paper}>
-                <Typography variant="h3">Thông tin người dùng</Typography>
+                <Typography variant="h3">Tạo mới người dùng</Typography>
                 <form className={classes.form} onSubmit={handleSubmit}>
                     <Grid container spacing={2}>
                         {/* Tài khoản */}
@@ -105,7 +109,8 @@ export default function CreateCustomer() {
                                             type="text"
                                             id="username"
                                             name="username"
-                                            // label={state?.user.username}
+                                            label="username"
+                                            required
                                             value={inputs.username}
                                             onChange={handleInputChange}
                                         />
@@ -118,6 +123,7 @@ export default function CreateCustomer() {
                                             name="password"
                                             label="Password"
                                             type="password"
+                                            required
                                             autoComplete="current-password"
                                             value={inputs.password}
                                             onChange={handleInputChange}
@@ -128,11 +134,11 @@ export default function CreateCustomer() {
                                         <TextField
                                             id="ConfirmPassword"
                                             variant="outlined"
-                                            required
                                             fullWidth
                                             name="ConfirmPassword"
                                             label="Confirm password"
                                             type="password"
+                                            required
                                             autoComplete="current-password"
                                             value={inputs.confirm_password}
                                             onChange={handleInputChange}
@@ -146,7 +152,7 @@ export default function CreateCustomer() {
 
                         {/* Thông tin người dùng */}
                         <Grid item xs={8}>
-                            <Typography variant="h5">Thông tin người dùng</Typography>
+                            <Typography variant="h5">Thông tin</Typography>
                             <Grid container xs={12} spacing={2}>
                                 {/* Tên */}
                                 <Grid item xs={6}>
@@ -269,7 +275,33 @@ export default function CreateCustomer() {
                     </Grid>
                 </form>
             </div>
+            <Dialog
+                open={open}
+                onClose={handleCloseDialog}
+                aria-labelledby="alert-dialog-title"
+                aria-describedby="alert-dialog-description"
+            >
+                <DialogTitle id="alert-dialog-title">Thông báo</DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        Bạn đã tạo mới nhân viên thành công
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseDialog} color="primary" autoFocus>
+                        Quay về
+                    </Button>
+                    <Button onClick={handleContinue} color="primary" autoFocus>
+                        Tạo mới
+                    </Button>
+                </DialogActions>
+            </Dialog>
 
+            <Snackbar open={openError} autoHideDuration={6000} onClose={handleCloseAlert}>
+                <Alert onClose={handleCloseAlert} severity="warning">
+                    Lỗi xác nhận mật khẩu
+                </Alert>
+            </Snackbar>
         </Container>
     );
 }

@@ -16,6 +16,7 @@ import {
     DialogContentText,
     DialogTitle,
 } from '@material-ui/core';
+import SearchIcon from '@material-ui/icons/Search';
 import { useStyles } from './EmployeeDetail-style';
 import API, { endpoints } from '../../helpers/API';
 import useSubmitForm from '../../helpers/CustomHooks'
@@ -107,18 +108,9 @@ export default function InfoCustomer() {
     const [title, setTitle] = useState('')
     const [booking, setBooking] = useState([]);
     const [news, setNews] = useState([]);
-    // const [checkUser, setCheckUser] = useState(false);
-
 
     useEffect(() => {
         async function init() {
-            // if (state) {
-            //     setCheckUser(true)
-            // }
-            // else {
-            //     setCheckUser(false)
-            //     console.info('state', 'khong co')
-            // }
             setLoading(true)
             await fetchNews()
             await fetchBooking()
@@ -201,6 +193,28 @@ export default function InfoCustomer() {
     const handleChooseBooking = () => {
         console.info('đã chọn')
     };
+
+    // chức năng tìm kiếm nhân viên theo email
+    const handleChangeEmail = (e) => {
+        setTitle(e.target.value)
+    };
+    const handleSearch = () => {
+        fetchNews()
+    };
+
+    // xử lý nut enter khi tìm kiếm
+    const handleKeyDown = (e) => {
+        if (e.key === "Enter") {
+            handleSearch();
+        }
+    };
+
+    // chọn nút tạo mới
+    const handleCreate = () => {
+        const _path = ProtectRoutes.NewsTourCre.path;
+        history.push(_path);
+    };
+
 
     return (
         <Container maxWidth='lg'>
@@ -352,10 +366,47 @@ export default function InfoCustomer() {
                 </Grid>
             </Grid>
 
+            <Typography variant="h5">Các bài viết đã đăng</Typography>
+            {/* tìm kiếm */}
+            <Grid container xs={12} spacing={2}>
+                <Grid item xs={5}>
+                    <TextField
+                        autoComplete="username"
+                        variant="outlined"
+                        fullWidth
+                        name="title"
+                        label="tiêu đề bài viết . . ."
+                        type="text"
+                        id="title"
+                        value={title}
+                        onChange={handleChangeEmail}
+                        onKeyDown={handleKeyDown}
+                    />
+                </Grid>
+                <Grid item xs={2}>
+                    <Button
+                        fullWidth
+                        variant="contained"
+                        color="primary"
+                        className={classes.submit}
+                        onClick={handleSearch}
+                    >
+                        <SearchIcon />
+                    </Button>
+                    <Button
+                        // fullWidth
+                        variant="contained"
+                        color="primary"
+                        className={classes.submit}
+                        onClick={handleCreate}
+                    >
+                        Tạo mới
+                    </Button>
+                </Grid>
+            </Grid>
             {/* các bài viết đã đăng */}
             <Grid container xs={12}>
                 <Grid item>
-                    <Typography variant="h5">Các bài viết đã đăng</Typography>
                     {loading ? <p>Loading ...</p> :
                         <AppTable columns={columns} data={news} handleChoose={handleChooseNews} />
                     }

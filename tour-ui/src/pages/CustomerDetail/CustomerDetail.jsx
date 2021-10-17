@@ -3,19 +3,12 @@ import {
     Button,
     CssBaseline,
     TextField,
-    FormControlLabel,
-    Checkbox,
-    Link,
     Grid,
-    Box,
     Typography,
     Container,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogContentText,
-    DialogTitle,
+    Snackbar,
 } from '@material-ui/core';
+import MuiAlert from '@material-ui/lab/Alert';
 import { useStyles } from './CustomerDetail-styles';
 import API, { endpoints } from '../../helpers/API';
 import useSubmitForm from '../../helpers/CustomHooks'
@@ -57,28 +50,24 @@ function createData(stt, static1, people1, people2, total, tourId, employeeId) {
     return { stt, static1, people1, people2, total, tourId, employeeId };
 }
 
+function Alert(props) {
+    return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
+
 export default function InfoCustomer() {
     const classes = useStyles();
     const avatar = createRef();
     const history = useHistory()
     const { state } = useLocation();
 
-    const [open, setOpen] = useState(false);
+    const [openSuccess, setOpenSuccess] = useState(false);
     const [loading, setLoading] = useState(false)
 
     const [booKing, setBooking] = useState([]);
-    const [checkUser, setCheckUser] = useState(false);
 
 
     useEffect(() => {
         async function init() {
-            if (state) {
-                setCheckUser(true)
-            }
-            else {
-                setCheckUser(false)
-                console.info('state', 'khong co')
-            }
             setLoading(true)
             await fetchBooking()
         }
@@ -111,38 +100,44 @@ export default function InfoCustomer() {
         })
     }
 
-    const create = async () => {
+    const changeInfo = async () => {
         const formData = new FormData();
 
-        if (inputs.password === inputs.confirm_password) {
-            for (let k in inputs) {
-                if (k !== "confirm_password") formData.append(k, inputs[k]);
-            }
+        for (let k in inputs) {
+            formData.append(k, inputs[k]);
         }
 
-        formData.append("avatar", avatar.current.files[0]);
-        formData.append("role", "NGUOI DUNG");
+        if (avatar.current.files.length != 0) {
+            formData.append("avatar", avatar.current.files[0]);
+        }
 
         for (var key of formData.keys()) {
             console.log(key, formData.get(key));
         }
         try {
-            let res = await API.post(endpoints["user"], formData, {
+            const _path = endpoints["user"] + `${state?.user.id}/`
+            let res = await API.patch(_path, formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
             });
-            console.info("res:", res)
             if (res)
-                setOpen(true);
+                setOpenSuccess(true);
         } catch (err) {
             console.log("ERROR:\n", err);
         }
     };
 
-    const { inputs, handleInputChange, handleSubmit } = useSubmitForm(create);
+    const { inputs, handleInputChange, handleSubmit } = useSubmitForm(changeInfo);
 
     const handleBlack = () => {
+        const _path = ProtectRoutes.Customer.path;
+        history.push(_path);
+    };
+
+    // xử lý sau khi hiện thông báo
+    const handleCloseAlert = () => {
+        setOpenSuccess(false);
         const _path = ProtectRoutes.Customer.path;
         history.push(_path);
     };
@@ -294,6 +289,12 @@ export default function InfoCustomer() {
                 </Grid>
             </Grid>
 
+            {/* xử lý thông báo khi thực hiện cập nhập */}
+            <Snackbar open={openSuccess} autoHideDuration={6000} onClose={handleCloseAlert}>
+                <Alert onClose={handleCloseAlert} severity="success">
+                    Bạn đã cập nhập thành công
+                </Alert>
+            </Snackbar>
         </Container>
     );
 }

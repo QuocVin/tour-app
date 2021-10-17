@@ -78,11 +78,11 @@ const columns = [
     },
 ];
 
-function createData(stt, title, dateCreate, dateEnd, descriptions, static1) {
-    return { stt, title, dateCreate, dateEnd, descriptions, static1 };
+function createData(stt, title, dateCreate, dateEnd, descriptions, static1, userId) {
+    return { stt, title, dateCreate, dateEnd, descriptions, static1, userId };
 }
 
-export default function AdminTour() {
+export default function AdminNews() {
     const classes = useStyles();
     const history = useHistory();
     const [loading, setLoading] = useState(false)
@@ -98,6 +98,7 @@ export default function AdminTour() {
         init()
     }, [])
 
+    // lấy danh sách bài viết
     const fetchNews = async () => {
         setLoading(true)
         setTimeout(() => {
@@ -105,7 +106,7 @@ export default function AdminTour() {
             API.get(_path).then(res => {
                 setNews(
                     res.data.map((b, idx) =>
-                        createData(idx + 1, b.title, b.dateCreate, b.dateEnd, b.descriptions, b.static)
+                        createData(idx + 1, b.title, b.dateCreate, b.dateEnd, b.descriptions, b.static, b.id)
                     )
                 );
                 setLoading(false)
@@ -113,29 +114,29 @@ export default function AdminTour() {
         }, 500);
     }
 
+    // xử lý tìm kiếm bài viết bằng title
     const handleChangeTitle = (e) => {
         setTitle(e.target.value)
     };
-
     const handleSearch = () => {
         fetchNews()
     };
 
+    // xử lý nút enter khi tìm kiếm
     const handleKeyDown = (e) => {
         if (e.key === "Enter") {
             handleSearch();
         }
     };
 
-    const handleChooseNews = (userId) => {
-        // const _pathAPI = endpoints['user'] + endpoints['employee'] + `?id=${userId}`;
-        // API.get(_pathAPI).then(res => {
-        //     const _pathPage = ProtectRoutes.EmployeeDetail.path.replace(":id", userId)
-        //     history.push(_pathPage, {
-        //         user: res.data[0],
-        //     })
-        // })
-        console.info('choose')
+    const handleChooseNews = (newsId) => {
+        const _pathAPI = endpoints['news-tour'] + `${newsId}/`;
+        API.get(_pathAPI).then(res => {
+            const _pathPage = ProtectRoutes.NewsTourDetail.path.replace(":id", newsId)
+            history.push(_pathPage, {
+                news: res.data[0],
+            })
+        })
     }
 
     // chọn nút tạo mới

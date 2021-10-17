@@ -92,6 +92,7 @@ export default function NewsTourDetail() {
 
     //  hiểu đơn giản là load trang
     useEffect(() => {
+        console.info('avatar', user.avatar)
         async function init() {
             setLoading(true)
             await fetchBooking()
@@ -102,7 +103,8 @@ export default function NewsTourDetail() {
     // lấy dữ liệu các đơn đặt tour của khách
     const fetchBooking = async () => {
         setTimeout(() => {
-            const _path = endpoints['booking'] + endpoints['booking-current-user'] + `?page=${page}` + `&customer=${user.id}`
+            const _path = endpoints['booking'] + endpoints['booking-current-user'] + `?customer=${user.id}`
+            // const _path = endpoints['booking'] + endpoints['booking-current-user'] + `?page=${page}` + `&customer=${user.id}`
             API.get(_path).then(res => {
                 setBooking(res.data)
                 setCount(res.data.length)
@@ -142,8 +144,6 @@ export default function NewsTourDetail() {
                 cookies.save("user", res.data);
                 setOpen(true);
             }
-            console.info("res:", res.data)
-            console.info("user:", user.avatar)
         } catch (err) {
             console.log("ERROR:\n", err);
         }
@@ -184,7 +184,7 @@ export default function NewsTourDetail() {
     const handleCloseDialog = () => {
         setOpen(false);
         user = cookies.load("user")
-        // window.location.reload();
+        window.location.reload();
     };
 
     return (

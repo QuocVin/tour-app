@@ -216,7 +216,7 @@ class BookingViewSet(viewsets.ViewSet, generics.CreateAPIView,
 
     # các giao dịch liên quan đến nhân viên
     @action(methods=['get'], detail=False, url_path='current-employee')
-    def booking_current_user(self, request):
+    def booking_current_employee(self, request):
         if request.query_params.__contains__('employee'):
             query = Booking.objects.filter(
                 employee=request.query_params.__getitem__('employee')

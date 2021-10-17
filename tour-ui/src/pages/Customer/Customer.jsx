@@ -105,7 +105,7 @@ export default function Customer() {
             API.get(_path).then(res => {
                 setUsers(
                     res.data.map((b, idx) =>
-                        createData(idx + 1, b.first_name + ` ${b.last_name}`, b.username, b.email, b.phone, b.address, b.id),
+                        createData(idx + 1, b.last_name + ` ${b.first_name}`, b.username, b.email, b.phone, b.address, b.id),
                     )
                 );
                 setLoading(false)
@@ -145,9 +145,6 @@ export default function Customer() {
                 user: res.data[0],
             })
         })
-        // const _pathPage = ProtectRoutes.CustomerDetail.path.replace("new", userId)
-        // console.info('_pathAPI', _pathAPI)
-        // console.info('_pathPage', _pathPage)
     }
 
     return (

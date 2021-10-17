@@ -45,7 +45,8 @@ export default function ({ classes, open, setOpen, mainRef }) {
         if (user.username != null)
             userComponet = <>
                 <Button>
-                    <Avatar onClick={() => handleLogin_click('/Profile')} alt={user.username} src={`http://localhost:8000${user.avatar}`} />
+                    <Avatar onClick={() => handleLogin_click('/Profile')} alt={user.username} 
+                    src={user.avatar.includes('http://127.0.0.1:8000') ? user.avatar : `http://127.0.0.1:8000${user.avatar}`} />
                 </Button>
                 <Button onClick={handleLogout_click}> <Typography variant="subtitle1" style={{ textTransform: 'none' }}>Đăng xuất</Typography> </Button>
             </>
