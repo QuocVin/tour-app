@@ -8,6 +8,7 @@ export let endpoints = {
 
     'customer':             'customer/',
     'employee':             'employee/',
+    'current-employee':     'current-employee/',
 
     'address':              '/address/',
     'tour':                 '/tour/',

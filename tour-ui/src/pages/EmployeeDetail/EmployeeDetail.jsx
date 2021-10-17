@@ -27,6 +27,40 @@ import AppTable from '../../components/Table';
 const columns = [
     { id: 'stt', label: 'STT', maxWidth: 20, align: 'center', },
     {
+        id: 'title',
+        label: 'Tiêu đề',
+        minWidth: 100,
+        align: 'left',
+    },
+    {
+        id: 'descriptions',
+        label: 'Mô tả',
+        minWidth: 200,
+        align: 'left',
+    },
+    {
+        id: 'dateCreate',
+        label: 'Ngày tạo',
+        minWidth: 100,
+        align: 'right',
+    },
+    {
+        id: 'dateEnd',
+        label: 'Ngày hết hạn',
+        minWidth: 150,
+        align: 'right',
+    },
+    {
+        id: 'static1',
+        label: 'trạng thái',
+        minWidth: 150,
+        align: 'center',
+    },
+];
+
+const columnsBooking = [
+    { id: 'stt', label: 'STT', maxWidth: 20, align: 'center', },
+    {
         id: 'static1',
         label: 'Trạng thái',
         minWidth: 100,
@@ -53,7 +87,11 @@ const columns = [
     },
 ];
 
-function createData(stt, static1, people1, people2, total, tourId, employeeId) {
+function createData(stt, title, descriptions, dateCreate, dateEnd, static1,) {
+    return { stt, title, descriptions, dateCreate, dateEnd, static1, };
+}
+
+function createBooking(stt, static1, people1, people2, total, tourId, employeeId) {
     return { stt, static1, people1, people2, total, tourId, employeeId };
 }
 
@@ -66,25 +104,50 @@ export default function InfoCustomer() {
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false)
 
-    const [booKing, setBooking] = useState([]);
-    const [checkUser, setCheckUser] = useState(false);
+    const [title, setTitle] = useState('')
+    const [booking, setBooking] = useState([]);
+    const [news, setNews] = useState([]);
+    // const [checkUser, setCheckUser] = useState(false);
 
 
     useEffect(() => {
         async function init() {
-            if (state) {
-                setCheckUser(true)
-            }
-            else {
-                setCheckUser(false)
-                console.info('state', 'khong co')
-            }
+            // if (state) {
+            //     setCheckUser(true)
+            // }
+            // else {
+            //     setCheckUser(false)
+            //     console.info('state', 'khong co')
+            // }
             setLoading(true)
-            // await fetchBooking()
+            await fetchNews()
+            await fetchBooking()
+            setLoading(false)
         }
         init()
     }, [])
 
+    const fetchNews = () => {
+        const _pathAPI = endpoints['news-tour'] + endpoints['search-title'] + `?employee=${state?.user.id}&title=${title}`;
+        API.get(_pathAPI).then(res => {
+            setNews(
+                res.data.map((b, idx) =>
+                    createData(idx + 1, b.title, b.descriptions, b.dateCreate, b.dateEnd, b.static)
+                )
+            )
+        })
+    }
+
+    const fetchBooking = () => {
+        const _pathAPI = endpoints['booking'] + endpoints['current-employee'] + `?employee=${state?.user.id}`;
+        API.get(_pathAPI).then(res => {
+            setBooking(
+                res.data.map((b, idx) =>
+                    createBooking(idx + 1, b.static, b.people1 + ' người', b.people2 + ' bé', b.totalPrice + ' VNĐ', b.tour_id, b.employee_id),
+                )
+            )
+        })
+    }
 
     const create = async () => {
         const formData = new FormData();
@@ -122,14 +185,31 @@ export default function InfoCustomer() {
         history.push(_path);
     };
 
+    // xử lý chuyển trang khi chọn bài viết
+    const handleChooseNews = () => {
+        // const _pathAPI = endpoints['user'] + endpoints['employee'] + `?id=${userId}`;
+        // API.get(_pathAPI).then(res => {
+        //     const _pathPage = ProtectRoutes.EmployeeDetail.path.replace(":id", userId)
+        //     history.push(_pathPage, {
+        //         user: res.data[0],
+        //     })
+        // })
+        console.info('chưa xử lý')
+    };
+
+    // xử lý khi chọn giao dịch khách hàng để tránh bị lỗi
+    const handleChooseBooking = () => {
+        console.info('đã chọn')
+    };
+
     return (
         <Container maxWidth='lg'>
             <CssBaseline />
             <Typography variant="h3">Nhân viên {state?.user.username}</Typography>
-            <Grid container xs={12} spacing={10}>
+            <Grid container xs={12} spacing={1}>
                 {/* thông tin người dùng */}
-                <Grid item xs={5}>
-                    <Typography variant="h5">Thông tin người dùng</Typography>
+                <Grid item xs={4}>
+                    <Typography variant="h5">Thông tin</Typography>
                     <form className={classes.form} onSubmit={handleSubmit}>
                         {/* <form className={classes.form} > */}
                         <Grid container spacing={2}>
@@ -260,15 +340,27 @@ export default function InfoCustomer() {
                     </form>
                 </Grid>
 
-                {/* lịch sử giao dịch */}
-                {/* <Grid item xs={7}>
-                    <Typography variant="h5">Lịch sử giao dịch</Typography>
+                {/* lịch sử hoạt động */}
+                <Grid item xs={8}>
+                    <Typography variant="h4">Lịch sử hoạt động</Typography>
+
+                    {/* các giao dịch liên quan */}
+                    <Typography variant="h5">Các giao dịch với khách hàng</Typography>
                     {loading ? <p>Loading ...</p> :
-                        <AppTable columns={columns} data={booKing} handleChooseBooking={handleChooseBooking} />
+                        <AppTable columns={columnsBooking} data={booking} handleChoose={handleChooseBooking} />
                     }
-                </Grid> */}
+                </Grid>
             </Grid>
 
+            {/* các bài viết đã đăng */}
+            <Grid container xs={12}>
+                <Grid item>
+                    <Typography variant="h5">Các bài viết đã đăng</Typography>
+                    {loading ? <p>Loading ...</p> :
+                        <AppTable columns={columns} data={news} handleChoose={handleChooseNews} />
+                    }
+                </Grid>
+            </Grid>
         </Container>
     );
 }

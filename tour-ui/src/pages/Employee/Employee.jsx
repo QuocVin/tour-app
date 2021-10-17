@@ -91,6 +91,7 @@ export default function Employee() {
 
     const [users, setUsers] = useState([])
 
+    // tải trang
     useEffect(() => {
         async function init() {
             // setLoading(true)
@@ -99,6 +100,7 @@ export default function Employee() {
         init()
     }, [])
 
+    // lấy dữ liệu danh sách nhân viên
     const fetchUser = async () => {
         setLoading(true)
         setTimeout(() => {
@@ -114,20 +116,22 @@ export default function Employee() {
         }, 500);
     }
 
+    // chức năng tìm kiếm nhân viên theo email
     const handleChangeEmail = (e) => {
         setEmail(e.target.value)
     };
-
     const handleSearch = () => {
         fetchUser()
     };
 
+    // xử lý nut enter khi tìm kiếm
     const handleKeyDown = (e) => {
         if (e.key === "Enter") {
             handleSearch();
         }
     };
 
+    // chọn nhân viên trong bảng
     const handleChooseUser = (userId) => {
         const _pathAPI = endpoints['user'] + endpoints['employee'] + `?id=${userId}`;
         API.get(_pathAPI).then(res => {

@@ -137,7 +137,7 @@ class NewsTourViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.ListAPI
     serializer_class = NewsTourSerializer
     pagination_class = NewsTourPagination
 
-    # tìm kiếm bài viết có thông tin về tour thông qua tourId
+    # tìm kiếm bài viết có thông tin về tour thông qua tourId - view người dùng
     @action(methods=['get'], detail=False, url_path='have-tour')
     def have_tour(self, request):
         if request.query_params.__contains__('tour') and request.query_params.__contains__('employee'):
@@ -153,12 +153,22 @@ class NewsTourViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.ListAPI
     # tìm kiếm bài viết qua title
     @action(methods=['get'], detail=False, url_path='search-title')
     def search_title(self, request):
-        if request.query_params.__contains__('title'):
+        # tìm kiếm các bài viết mà nhân viên đã viết - view quản trị
+        if request.query_params.__contains__('title') and request.query_params.__contains__('employee'):
             query = NewsTour.objects.filter(
                 title__icontains=request.query_params.__getitem__('title'),
                 static='DANG MO',
+                employee=request.query_params.__getitem__('employee'),
             )
             return Response(list(query.values()))
+        else:
+            # tìm kiếm các bài viết qua title
+            if request.query_params.__contains__('title'):
+                query = NewsTour.objects.filter(
+                    title__icontains=request.query_params.__getitem__('title'),
+                    static='DANG MO',
+                )
+                return Response(list(query.values()))
         return Response({"invalid request": "not found"},
                         status.HTTP_400_BAD_REQUEST)
 
@@ -203,3 +213,14 @@ class BookingViewSet(viewsets.ViewSet, generics.CreateAPIView,
             return Response(list(query.values()))
         return Response({"invalid request": "not found"},
                         status.HTTP_400_BAD_REQUEST)
+
+    # các giao dịch liên quan đến nhân viên
+    @action(methods=['get'], detail=False, url_path='current-employee')
+    def booking_current_user(self, request):
+        if request.query_params.__contains__('employee'):
+            query = Booking.objects.filter(
+                employee=request.query_params.__getitem__('employee')
+            )
+            return Response(list(query.values()))
+        return Response({"invalid request": "not found"},
+                    status.HTTP_400_BAD_REQUEST)
