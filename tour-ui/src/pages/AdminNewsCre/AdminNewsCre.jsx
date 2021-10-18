@@ -83,8 +83,8 @@ export default function CreateNews() {
         }
 
         formData.append("static", "DANG MO");
-        formData.append("tour_id", tourChoosed.id);
-        formData.append("employee_id", user.id);
+        formData.append("tour", tourChoosed.id);
+        formData.append("employee", user.id);
         if (image.current.files.length != 0) {
             formData.append("image", image.current.files[0]);
         }

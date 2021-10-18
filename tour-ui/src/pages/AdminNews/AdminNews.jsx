@@ -1,44 +1,14 @@
-import React, { createRef, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-    makeStyles,
     Grid,
     Typography,
-    Divider,
     Container,
     Button,
-    DialogTitle,
-    DialogContentText,
-    DialogContent,
-    DialogActions,
-    Dialog,
     TextField,
-    Accordion,
-    AccordionSummary,
-    AccordionDetails,
-    ListSubheader,
-    List,
-    ListItem,
-    ListItemText,
-    Box,
-    CssBaseline,
-    FormControlLabel,
-    Checkbox,
-    Paper,
-    Table,
-    TableCell,
-    TableBody,
-    TableContainer,
-    TableHead,
-    TablePagination,
-    TableRow,
 } from '@material-ui/core';
-import useSubmitForm from '../../helpers/CustomHooks'
 import API, { endpoints } from '../../helpers/API';
 import { useStyles } from './AdminNews-styles';
-import { useStore } from "react-redux";
-import cookies from 'react-cookies';
 import { useHistory } from 'react-router';
-import Pagination from '@material-ui/lab/Pagination';
 import AppTable from '../../components/Table';
 import SearchIcon from '@material-ui/icons/Search';
 import { ProtectRoutes } from '../../routes/protect-route';
@@ -92,7 +62,6 @@ export default function AdminNews() {
 
     useEffect(() => {
         async function init() {
-            // setLoading(true)
             await fetchNews()
         }
         init()
@@ -138,7 +107,6 @@ export default function AdminNews() {
                 newsId: res.data.id,
                 tourId: res.data.tour,
             })
-            console.info('data', res.data.tour)
         })
     }
 

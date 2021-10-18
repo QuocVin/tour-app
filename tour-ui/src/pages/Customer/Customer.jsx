@@ -91,7 +91,7 @@ export default function Customer() {
 
     useEffect(() => {
         async function init() {
-            // setLoading(true)
+            setLoading(true)
             await fetchUser()
         }
         init()
@@ -99,13 +99,12 @@ export default function Customer() {
 
     // lấy thông tin người dùng + tìm kiếm người dùng thông qua request
     const fetchUser = async () => {
-        setLoading(true)
         setTimeout(() => {
             const _path = endpoints['user'] + endpoints['customer'] + `?email=${email}`
             API.get(_path).then(res => {
                 setUsers(
                     res.data.map((b, idx) =>
-                        createData(idx + 1, b.last_name + ` ${b.first_name}`, b.username, b.email, b.phone, b.address, b.id),
+                        createData(idx + 1, b.first_name + ` ${b.last_name}`, b.username, b.email, b.phone, b.address, b.id),
                     )
                 );
                 setLoading(false)
@@ -142,7 +141,7 @@ export default function Customer() {
         API.get(_pathAPI).then(res => {
             const _pathPage = ProtectRoutes.CustomerDetail.path.replace(":id", userId)
             history.push(_pathPage, {
-                user: res.data[0],
+                userId: res.data[0].id,
             })
         })
     }
@@ -165,7 +164,7 @@ export default function Customer() {
                         onChange={handleChangeEmail}
                         onKeyDown={handleKeyDown}
                     />
-                    
+
                 </Grid>
                 <Grid item xs={1}>
                     <Button
@@ -193,7 +192,7 @@ export default function Customer() {
 
             {/* bản thông tin */}
             {loading ? <p>Loading ...</p> :
-                <AppTable columns={columns} data={users} handleChoose={handleChooseUser}/>
+                <AppTable columns={columns} data={users} handleChoose={handleChooseUser} />
             }
         </Container>
 

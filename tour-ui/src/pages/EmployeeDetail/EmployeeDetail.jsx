@@ -3,26 +3,18 @@ import {
     Button,
     CssBaseline,
     TextField,
-    FormControlLabel,
-    Checkbox,
-    Link,
     Grid,
-    Box,
     Typography,
     Container,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogContentText,
-    DialogTitle,
+    Snackbar,
 } from '@material-ui/core';
+import MuiAlert from '@material-ui/lab/Alert';
 import SearchIcon from '@material-ui/icons/Search';
 import { useStyles } from './EmployeeDetail-style';
 import API, { endpoints } from '../../helpers/API';
 import useSubmitForm from '../../helpers/CustomHooks'
 import { useHistory, useLocation } from 'react-router';
 import { ProtectRoutes } from '../../routes/protect-route';
-import { PublicRoutes } from '../../routes/public-route';
 import AppTable from '../../components/Table';
 
 const columns = [
@@ -88,12 +80,16 @@ const columnsBooking = [
     },
 ];
 
-function createData(stt, title, descriptions, dateCreate, dateEnd, static1,) {
-    return { stt, title, descriptions, dateCreate, dateEnd, static1, };
+function createData(stt, title, descriptions, dateCreate, dateEnd, static1, userId) {
+    return { stt, title, descriptions, dateCreate, dateEnd, static1, userId };
 }
 
 function createBooking(stt, static1, people1, people2, total, tourId, employeeId) {
     return { stt, static1, people1, people2, total, tourId, employeeId };
+}
+
+function Alert(props) {
+    return <MuiAlert elevation={6} variant="filled" {...props} />;
 }
 
 export default function InfoCustomer() {
@@ -101,8 +97,9 @@ export default function InfoCustomer() {
     const avatar = createRef();
     const history = useHistory()
     const { state } = useLocation();
+    const [user, setUser] = useState([]);
 
-    const [open, setOpen] = useState(false);
+    const [openSuccess, setOpenSuccess] = useState(false);
     const [loading, setLoading] = useState(false)
 
     const [title, setTitle] = useState('')
@@ -112,82 +109,101 @@ export default function InfoCustomer() {
     useEffect(() => {
         async function init() {
             setLoading(true)
+            await fetchUser()
             await fetchNews()
             await fetchBooking()
-            setLoading(false)
         }
         init()
     }, [])
 
+    // lấy thông tin nhân viên
+    const fetchUser = () => {
+        setTimeout(() => {
+            const _pathAPI = endpoints['user'] + endpoints['employee'] + `?id=${state?.userId}`;
+            API.get(_pathAPI).then(res => {
+                setUser(res.data[0])
+            })
+        }, 500);
+    }
+
+    // lấy thông tin các bài viết đã đăng
     const fetchNews = () => {
-        const _pathAPI = endpoints['news-tour'] + endpoints['search-title'] + `?employee=${state?.user.id}&title=${title}`;
-        API.get(_pathAPI).then(res => {
-            setNews(
-                res.data.map((b, idx) =>
-                    createData(idx + 1, b.title, b.descriptions, b.dateCreate, b.dateEnd, b.static)
+        setTimeout(() => {
+            const _pathAPI = endpoints['news-tour'] + endpoints['search-title'] + `?employee=${state?.userId}&title=${title}`;
+            API.get(_pathAPI).then(res => {
+                setNews(
+                    res.data.map((b, idx) =>
+                        createData(idx + 1, b.title, b.descriptions, b.dateCreate, b.dateEnd, b.static, b.id)
+                    )
                 )
-            )
-        })
+            })
+        }, 500);
     }
 
+    // lấy thông tin các booking liên quan
     const fetchBooking = () => {
-        const _pathAPI = endpoints['booking'] + endpoints['current-employee'] + `?employee=${state?.user.id}`;
-        API.get(_pathAPI).then(res => {
-            setBooking(
-                res.data.map((b, idx) =>
-                    createBooking(idx + 1, b.static, b.people1 + ' người', b.people2 + ' bé', b.totalPrice + ' VNĐ', b.tour_id, b.employee_id),
+        setTimeout(() => {
+            const _pathAPI = endpoints['booking'] + endpoints['current-employee'] + `?employee=${state?.userId}`;
+            API.get(_pathAPI).then(res => {
+                setBooking(
+                    res.data.map((b, idx) =>
+                        createBooking(idx + 1, b.static, b.people1 + ' người', b.people2 + ' bé', b.totalPrice + ' VNĐ', b.tour_id, b.employee_id),
+                    )
                 )
-            )
-        })
+            })
+            setLoading(false);
+        }, 500);
     }
 
-    const create = async () => {
+    // api patch thay đổi thông tin các nhân nhân viên
+    const changeInfo = async () => {
         const formData = new FormData();
 
-        if (inputs.password === inputs.confirm_password) {
-            for (let k in inputs) {
-                if (k !== "confirm_password") formData.append(k, inputs[k]);
-            }
+        for (let k in inputs) {
+            formData.append(k, inputs[k]);
         }
 
-        formData.append("avatar", avatar.current.files[0]);
-        formData.append("role", "NGUOI DUNG");
+        if (avatar.current.files.length != 0) {
+            formData.append("avatar", avatar.current.files[0]);
+        }
 
         for (var key of formData.keys()) {
             console.log(key, formData.get(key));
         }
         try {
-            let res = await API.post(endpoints["user"], formData, {
+            const _path = endpoints["user"] + `${state?.userId}/`
+            let res = await API.patch(_path, formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
             });
-            console.info("res:", res)
             if (res)
-                setOpen(true);
+                setOpenSuccess(true);
         } catch (err) {
             console.log("ERROR:\n", err);
         }
     };
 
-    const { inputs, handleInputChange, handleSubmit } = useSubmitForm(create);
+    const { inputs, handleInputChange, handleSubmit } = useSubmitForm(changeInfo);
 
+    // chọn nút quay về
     const handleBlack = () => {
         const _path = ProtectRoutes.Employee.path;
         history.push(_path);
     };
 
     // xử lý chuyển trang khi chọn bài viết
-    const handleChooseNews = () => {
-        // const _pathAPI = endpoints['user'] + endpoints['employee'] + `?id=${userId}`;
-        // API.get(_pathAPI).then(res => {
-        //     const _pathPage = ProtectRoutes.EmployeeDetail.path.replace(":id", userId)
-        //     history.push(_pathPage, {
-        //         user: res.data[0],
-        //     })
-        // })
-        console.info('chưa xử lý')
-    };
+    const handleChooseNews = (newsId) => {
+        const _pathAPI = endpoints['news-tour'] + `${newsId}/`;
+        API.get(_pathAPI).then(res => {
+            const _pathPage = ProtectRoutes.NewsTourDetail.path.replace(":id", newsId)
+            history.push(_pathPage, {
+                newsId: res.data.id,
+                tourId: res.data.tour,
+            })
+            console.info('data', res.data.tour)
+        })
+    }
 
     // xử lý khi chọn giao dịch khách hàng để tránh bị lỗi
     const handleChooseBooking = () => {
@@ -215,11 +231,17 @@ export default function InfoCustomer() {
         history.push(_path);
     };
 
+    // xử lý sau khi hiện thông báo
+    const handleCloseAlert = () => {
+        setOpenSuccess(false);
+        window.location.reload();
+    };
+
 
     return (
         <Container maxWidth='lg'>
             <CssBaseline />
-            <Typography variant="h3">Nhân viên {state?.user.username}</Typography>
+            <Typography variant="h3">Nhân viên {user.username}</Typography>
             <Grid container xs={12} spacing={1}>
                 {/* thông tin người dùng */}
                 <Grid item xs={4}>
@@ -228,102 +250,104 @@ export default function InfoCustomer() {
                         {/* <form className={classes.form} > */}
                         <Grid container spacing={2}>
                             {/* Thông tin người dùng */}
-                            <Grid item xs={12}>
-                                <Grid container xs={12} spacing={2}>
-                                    {/* Tên */}
-                                    <Grid item xs={6}>
-                                        <Typography variant="caption">Họ</Typography>
-                                        <TextField
-                                            autoComplete="lname"
-                                            variant="outlined"
-                                            fullWidth
-                                            id="lastName"
-                                            name="last_name"
-                                            label={state?.user.last_name}
-                                            value={inputs.last_name}
-                                            onChange={handleInputChange}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={6}>
-                                        <Typography variant="caption">Tên</Typography>
-                                        <TextField
-                                            autoComplete="fname"
-                                            variant="outlined"
-                                            fullWidth
-                                            id="firstName"
-                                            autoFocus
-                                            type="text"
-                                            name="first_name"
-                                            label={state?.user.first_name}
-                                            value={inputs.first_name}
-                                            onChange={handleInputChange}
-                                        />
-                                    </Grid>
+                            {loading ? <p>loading . . .</p> :
+                                <Grid item xs={12}>
+                                    <Grid container xs={12} spacing={2}>
+                                        {/* Tên */}
+                                        <Grid item xs={6}>
+                                            <Typography variant="caption">Họ</Typography>
+                                            <TextField
+                                                autoComplete="lname"
+                                                variant="outlined"
+                                                fullWidth
+                                                id="lastName"
+                                                name="last_name"
+                                                label={user.last_name}
+                                                value={inputs.last_name}
+                                                onChange={handleInputChange}
+                                            />
+                                        </Grid>
+                                        <Grid item xs={6}>
+                                            <Typography variant="caption">Tên</Typography>
+                                            <TextField
+                                                autoComplete="fname"
+                                                variant="outlined"
+                                                fullWidth
+                                                id="firstName"
+                                                autoFocus
+                                                type="text"
+                                                name="first_name"
+                                                label={user.first_name}
+                                                value={inputs.first_name}
+                                                onChange={handleInputChange}
+                                            />
+                                        </Grid>
 
-                                    {/* email + số điện thoại */}
-                                    <Grid item xs={6} >
-                                        <Typography variant="caption">Email</Typography>
-                                        <TextField
-                                            autoComplete="email"
-                                            variant="outlined"
-                                            fullWidth
-                                            id="email"
-                                            name="email"
-                                            type="email"
-                                            label={state?.user.email}
-                                            value={inputs.email}
-                                            onChange={handleInputChange}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={6} >
-                                        <Typography variant="caption">Số điện thoại</Typography>
-                                        <TextField
-                                            autoComplete="phone"
-                                            variant="outlined"
-                                            fullWidth
-                                            name="phone"
-                                            type="number"
-                                            id="phone"
-                                            label={state?.user.phone}
-                                            value={inputs.phone}
-                                            onChange={handleInputChange}
-                                        />
-                                    </Grid>
+                                        {/* email + số điện thoại */}
+                                        <Grid item xs={6} >
+                                            <Typography variant="caption">Email</Typography>
+                                            <TextField
+                                                autoComplete="email"
+                                                variant="outlined"
+                                                fullWidth
+                                                id="email"
+                                                name="email"
+                                                type="email"
+                                                label={user.email}
+                                                value={inputs.email}
+                                                onChange={handleInputChange}
+                                            />
+                                        </Grid>
+                                        <Grid item xs={6} >
+                                            <Typography variant="caption">Số điện thoại</Typography>
+                                            <TextField
+                                                autoComplete="phone"
+                                                variant="outlined"
+                                                fullWidth
+                                                name="phone"
+                                                type="number"
+                                                id="phone"
+                                                label={user.phone}
+                                                value={inputs.phone}
+                                                onChange={handleInputChange}
+                                            />
+                                        </Grid>
 
-                                    {/* Địa chỉ */}
-                                    <Grid item xs={12} >
-                                        <Typography variant="caption">Địa chỉ</Typography>
-                                        <TextField
-                                            autoComplete="address"
-                                            variant="outlined"
-                                            fullWidth
-                                            id="address"
-                                            name="address"
-                                            label={state?.user.address}
-                                            value={inputs.address}
-                                            onChange={handleInputChange}
-                                        />
-                                    </Grid>
+                                        {/* Địa chỉ */}
+                                        <Grid item xs={12} >
+                                            <Typography variant="caption">Địa chỉ</Typography>
+                                            <TextField
+                                                autoComplete="address"
+                                                variant="outlined"
+                                                fullWidth
+                                                id="address"
+                                                name="address"
+                                                label={user.address}
+                                                value={inputs.address}
+                                                onChange={handleInputChange}
+                                            />
+                                        </Grid>
 
-                                    {/* ảnh */}
-                                    <Grid item xs={9} >
-                                        <input
-                                            accept="image/*"
-                                            className={classes.input}
-                                            id="contained-button-file"
-                                            multiple
-                                            type="file"
-                                            ref={avatar}
-                                        />
-                                        <label htmlFor="contained-button-file">
-                                            <Button variant="contained" color="primary"
-                                                maxWidth component="span">
-                                                Avatar
-                                            </Button>
-                                        </label>
+                                        {/* ảnh */}
+                                        <Grid item xs={9} >
+                                            <input
+                                                accept="image/*"
+                                                className={classes.input}
+                                                id="contained-button-file"
+                                                multiple
+                                                type="file"
+                                                ref={avatar}
+                                            />
+                                            <label htmlFor="contained-button-file">
+                                                <Button variant="contained" color="primary"
+                                                    maxWidth component="span">
+                                                    Avatar
+                                                </Button>
+                                            </label>
+                                        </Grid>
                                     </Grid>
                                 </Grid>
-                            </Grid>
+                            }
                         </Grid>
 
                         {/* nút xử lý quay về hoặc thực hiện cập nhập */}
@@ -412,6 +436,13 @@ export default function InfoCustomer() {
                     }
                 </Grid>
             </Grid>
+
+            {/* xử lý thông báo khi thực hiện cập nhập */}
+            <Snackbar open={openSuccess} autoHideDuration={6000} onClose={handleCloseAlert}>
+                <Alert onClose={handleCloseAlert} severity="success">
+                    Bạn đã cập nhập thành công
+                </Alert>
+            </Snackbar>
         </Container>
     );
 }

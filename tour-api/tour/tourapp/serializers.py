@@ -56,12 +56,12 @@ class RateSerializer(ModelSerializer):
 
 
 class NewsTourSerializer(ModelSerializer):
-    rate = RateSerializer(many=True)
+    # rate = RateSerializer(many=True)
 
     class Meta:
         model = NewsTour
         fields = ['id', 'title', 'descriptions', 'static',
-                  'employee', 'tour', 'dateEnd', 'dateCreate', 'image', 'rate']
+                  'employee', 'tour', 'dateEnd', 'dateCreate', 'image']
 
 
 class TourSerializer(ModelSerializer):

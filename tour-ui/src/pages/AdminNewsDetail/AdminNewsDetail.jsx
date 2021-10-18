@@ -63,6 +63,7 @@ export default function NewsDetail() {
         init()
     }, [])
 
+    // lấy thông tin bài viết đã chọn
     const fetchNews = async () => {
         setTimeout(() => {
             setLoading(true)
@@ -75,6 +76,7 @@ export default function NewsDetail() {
         }, 500);
     }
 
+    // lấy thông tin tour trong bài viết
     const fetchTourInNews = async () => {
         setTimeout(() => {
             const _path = endpoints['tour'] + `${state?.tourId}/`
@@ -88,6 +90,7 @@ export default function NewsDetail() {
         }, 500);
     }
 
+    // api patch thay đổi thông tin bài viết
     const changeInfo = async () => {
         const formData = new FormData();
 
@@ -150,6 +153,7 @@ export default function NewsDetail() {
         history.push(_path);
     };
 
+    // chọn nút đóng bài viết
     const handleCloseNews = () => {
         closeNews();
     };

@@ -108,7 +108,7 @@ export default function Employee() {
             API.get(_path).then(res => {
                 setUsers(
                     res.data.map((b, idx) =>
-                        createData(idx + 1, b.first_name + ` ${b.last_name}`, b.username, b.email, b.phone, b.address, b.id),
+                        createData(idx + 1, b.last_name + ` ${b.first_name}` , b.username, b.email, b.phone, b.address, b.id),
                     )
                 );
                 setLoading(false)
@@ -137,7 +137,7 @@ export default function Employee() {
         API.get(_pathAPI).then(res => {
             const _pathPage = ProtectRoutes.EmployeeDetail.path.replace(":id", userId)
             history.push(_pathPage, {
-                user: res.data[0],
+                userId: res.data[0].id,
             })
         })
     }

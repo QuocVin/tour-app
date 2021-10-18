@@ -59,6 +59,7 @@ export default function InfoCustomer() {
     const avatar = createRef();
     const history = useHistory()
     const { state } = useLocation();
+    const [user, setUser] = useState([]);
 
     const [openSuccess, setOpenSuccess] = useState(false);
     const [loading, setLoading] = useState(false)
@@ -69,23 +70,34 @@ export default function InfoCustomer() {
     useEffect(() => {
         async function init() {
             setLoading(true)
+            await fetchUser()
             await fetchBooking()
         }
         init()
     }, [])
 
+    // láy thông tin người dùng
+    const fetchUser = () => {
+        setTimeout(() => {
+            const _pathAPI = endpoints['user'] + endpoints['customer'] + `?id=${state?.userId}`;
+            API.get(_pathAPI).then(res => {
+                setUser(res.data[0])
+            })
+        }, 500);
+    }
+
     // lấy dữ liệu các đơn đặt tour của khách
     const fetchBooking = async () => {
         setTimeout(() => {
-            const _path = endpoints['booking'] + endpoints['booking-current-user'] + `?customer=${state?.user.id}`
+            const _path = endpoints['booking'] + endpoints['booking-current-user'] + `?customer=${state?.userId}`
             API.get(_path).then(res => {
                 setBooking(
                     res.data.map((b, idx) =>
                         createData(idx + 1, b.static, b.people1 + ' người', b.people2 + ' bé', b.totalPrice + ' VNĐ', b.tour_id, b.employee_id),
                     )
                 );
-                setLoading(false)
             })
+            setLoading(false)
         }, 500);
     }
 
@@ -100,6 +112,7 @@ export default function InfoCustomer() {
         })
     }
 
+    // api patch thay đổi thông tin người dùng
     const changeInfo = async () => {
         const formData = new FormData();
 
@@ -115,7 +128,7 @@ export default function InfoCustomer() {
             console.log(key, formData.get(key));
         }
         try {
-            const _path = endpoints["user"] + `${state?.user.id}/`
+            const _path = endpoints["user"] + `${state?.userId}/`
             let res = await API.patch(_path, formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
@@ -130,6 +143,7 @@ export default function InfoCustomer() {
 
     const { inputs, handleInputChange, handleSubmit } = useSubmitForm(changeInfo);
 
+    // chọn nút quay lại
     const handleBlack = () => {
         const _path = ProtectRoutes.Customer.path;
         history.push(_path);
@@ -138,14 +152,13 @@ export default function InfoCustomer() {
     // xử lý sau khi hiện thông báo
     const handleCloseAlert = () => {
         setOpenSuccess(false);
-        const _path = ProtectRoutes.Customer.path;
-        history.push(_path);
+        window.location.reload();
     };
 
     return (
         <Container maxWidth='lg'>
             <CssBaseline />
-            <Typography variant="h3">Người dùng {state?.user.username}</Typography>
+            <Typography variant="h3">Người dùng {user.username}</Typography>
             <Grid container xs={12} spacing={10}>
                 {/* thông tin người dùng */}
                 <Grid item xs={5}>
@@ -154,102 +167,104 @@ export default function InfoCustomer() {
                         {/* <form className={classes.form} > */}
                         <Grid container spacing={2}>
                             {/* Thông tin người dùng */}
-                            <Grid item xs={12}>
-                                <Grid container xs={12} spacing={2}>
-                                    {/* Tên */}
-                                    <Grid item xs={6}>
-                                        <Typography variant="caption">Họ</Typography>
-                                        <TextField
-                                            autoComplete="lname"
-                                            variant="outlined"
-                                            fullWidth
-                                            id="lastName"
-                                            name="last_name"
-                                            label={state?.user.last_name}
-                                            value={inputs.last_name}
-                                            onChange={handleInputChange}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={6}>
-                                        <Typography variant="caption">Tên</Typography>
-                                        <TextField
-                                            autoComplete="fname"
-                                            variant="outlined"
-                                            fullWidth
-                                            id="firstName"
-                                            autoFocus
-                                            type="text"
-                                            name="first_name"
-                                            label={state?.user.first_name}
-                                            value={inputs.first_name}
-                                            onChange={handleInputChange}
-                                        />
-                                    </Grid>
+                            {loading ? <p>loading. . .</p> :
+                                <Grid item xs={12}>
+                                    <Grid container xs={12} spacing={2}>
+                                        {/* Tên */}
+                                        <Grid item xs={6}>
+                                            <Typography variant="caption">Họ</Typography>
+                                            <TextField
+                                                autoComplete="lname"
+                                                variant="outlined"
+                                                fullWidth
+                                                id="lastName"
+                                                name="last_name"
+                                                label={user.last_name}
+                                                value={inputs.last_name}
+                                                onChange={handleInputChange}
+                                            />
+                                        </Grid>
+                                        <Grid item xs={6}>
+                                            <Typography variant="caption">Tên</Typography>
+                                            <TextField
+                                                autoComplete="fname"
+                                                variant="outlined"
+                                                fullWidth
+                                                id="firstName"
+                                                autoFocus
+                                                type="text"
+                                                name="first_name"
+                                                label={user.first_name}
+                                                value={inputs.first_name}
+                                                onChange={handleInputChange}
+                                            />
+                                        </Grid>
 
-                                    {/* email + số điện thoại */}
-                                    <Grid item xs={6} >
-                                        <Typography variant="caption">Email</Typography>
-                                        <TextField
-                                            autoComplete="email"
-                                            variant="outlined"
-                                            fullWidth
-                                            id="email"
-                                            name="email"
-                                            type="email"
-                                            label={state?.user.email}
-                                            value={inputs.email}
-                                            onChange={handleInputChange}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={6} >
-                                        <Typography variant="caption">Số điện thoại</Typography>
-                                        <TextField
-                                            autoComplete="phone"
-                                            variant="outlined"
-                                            fullWidth
-                                            name="phone"
-                                            type="number"
-                                            id="phone"
-                                            label={state?.user.phone}
-                                            value={inputs.phone}
-                                            onChange={handleInputChange}
-                                        />
-                                    </Grid>
+                                        {/* email + số điện thoại */}
+                                        <Grid item xs={6} >
+                                            <Typography variant="caption">Email</Typography>
+                                            <TextField
+                                                autoComplete="email"
+                                                variant="outlined"
+                                                fullWidth
+                                                id="email"
+                                                name="email"
+                                                type="email"
+                                                label={user.email}
+                                                value={inputs.email}
+                                                onChange={handleInputChange}
+                                            />
+                                        </Grid>
+                                        <Grid item xs={6} >
+                                            <Typography variant="caption">Số điện thoại</Typography>
+                                            <TextField
+                                                autoComplete="phone"
+                                                variant="outlined"
+                                                fullWidth
+                                                name="phone"
+                                                type="number"
+                                                id="phone"
+                                                label={user.phone}
+                                                value={inputs.phone}
+                                                onChange={handleInputChange}
+                                            />
+                                        </Grid>
 
-                                    {/* Địa chỉ */}
-                                    <Grid item xs={12} >
-                                        <Typography variant="caption">Địa chỉ</Typography>
-                                        <TextField
-                                            autoComplete="address"
-                                            variant="outlined"
-                                            fullWidth
-                                            id="address"
-                                            name="address"
-                                            label={state?.user.address}
-                                            value={inputs.address}
-                                            onChange={handleInputChange}
-                                        />
-                                    </Grid>
+                                        {/* Địa chỉ */}
+                                        <Grid item xs={12} >
+                                            <Typography variant="caption">Địa chỉ</Typography>
+                                            <TextField
+                                                autoComplete="address"
+                                                variant="outlined"
+                                                fullWidth
+                                                id="address"
+                                                name="address"
+                                                label={user.address}
+                                                value={inputs.address}
+                                                onChange={handleInputChange}
+                                            />
+                                        </Grid>
 
-                                    {/* ảnh */}
-                                    <Grid item xs={9} >
-                                        <input
-                                            accept="image/*"
-                                            className={classes.input}
-                                            id="contained-button-file"
-                                            multiple
-                                            type="file"
-                                            ref={avatar}
-                                        />
-                                        <label htmlFor="contained-button-file">
-                                            <Button variant="contained" color="primary"
-                                                maxWidth component="span">
-                                                Avatar
-                                            </Button>
-                                        </label>
+                                        {/* ảnh */}
+                                        <Grid item xs={9} >
+                                            <input
+                                                accept="image/*"
+                                                className={classes.input}
+                                                id="contained-button-file"
+                                                multiple
+                                                type="file"
+                                                ref={avatar}
+                                            />
+                                            <label htmlFor="contained-button-file">
+                                                <Button variant="contained" color="primary"
+                                                    maxWidth component="span">
+                                                    Avatar
+                                                </Button>
+                                            </label>
+                                        </Grid>
                                     </Grid>
                                 </Grid>
-                            </Grid>
+                            }
                         </Grid>
 
                         {/* nút xử lý quay về hoặc thực hiện cập nhập */}
