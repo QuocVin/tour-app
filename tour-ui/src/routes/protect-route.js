@@ -2,18 +2,22 @@ import DashboardPage from "../pages/Dashboard";
 import HomeIcon from "@material-ui/icons/Home";
 
 import CustomerPage from "../pages/Customer";
+import PeopleIcon from '@material-ui/icons/People';
 import InfoCusPage from "../pages/CustomerDetail";
 import CreateCusPage from "../pages/CustomerNew";
 
 import EmployeePage from "../pages/Employee";
+import PersonIcon from '@material-ui/icons/Person';
 import EmpNewPage from "../pages/EmployeeNew";
 import EmpDetailPage from "../pages/EmployeeDetail";
 
 import ManageTourPage from "../pages/AdminTour";
+import PermMediaIcon from '@material-ui/icons/PermMedia';
 import ManageTourNewPage from "../pages/AdminTourNew";
 import ManageTourDetailPage from "../pages/AdminTourDetail";
 
 import ManageNewsPage from "../pages/AdminNews";
+import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
 import ManageNewsCrePage from "../pages/AdminNewsCre";
 import ManageNewsDetailPage from "../pages/AdminNewsDetail";
 
@@ -50,19 +54,19 @@ export const AllRouteNames = {
 
 export const AdminPaths = {
     Dashboard: ['', ProtectRouteNames.Dashboard].join('/'),
-    Customer: ['', ProtectRouteNames.Customer].join('/'),
-    CustomerNew: ['', ProtectRouteNames.Customer, NEDRoutes.New].join('/'),
-    CustomerDetail: ['', ProtectRouteNames.Customer, NEDRoutes.Detail].join('/'),
-    Employee: ['', ProtectRouteNames.Employee].join('/'),
-    EmployeeNew: ['', ProtectRouteNames.Employee, NEDRoutes.New].join('/'),
-    EmployeeDetail: ['', ProtectRouteNames.Employee, NEDRoutes.Detail].join('/'),
-    
-    Tour: ['', ProtectRouteNames.Tour].join('/'),
-    TourNew: ['', ProtectRouteNames.TourNew, NEDRoutes.New].join('/'),
+    Customer: ['/Admin', ProtectRouteNames.Customer].join('/'),
+    CustomerNew: ['/Admin', ProtectRouteNames.Customer, NEDRoutes.New].join('/'),
+    CustomerDetail: ['/Admin', ProtectRouteNames.Customer, NEDRoutes.Detail].join('/'),
+    Employee: ['/Admin', ProtectRouteNames.Employee].join('/'),
+    EmployeeNew: ['/Admin', ProtectRouteNames.Employee, NEDRoutes.New].join('/'),
+    EmployeeDetail: ['/Admin', ProtectRouteNames.Employee, NEDRoutes.Detail].join('/'),
+
+    Tour: ['/Admin', ProtectRouteNames.Tour].join('/'),
+    TourNew: ['/Admin', ProtectRouteNames.TourNew, NEDRoutes.New].join('/'),
     TourDetail: ['/Admin', ProtectRouteNames.TourDetail, NEDRoutes.Detail].join('/'),
 
-    NewsTour: ['', ProtectRouteNames.NewsTour].join('/'),
-    NewsTourCre: ['', ProtectRouteNames.NewsTourCre, NEDRoutes.New].join('/'),
+    NewsTour: ['/Admin', ProtectRouteNames.NewsTour].join('/'),
+    NewsTourCre: ['/Admin', ProtectRouteNames.NewsTourCre, NEDRoutes.New].join('/'),
     NewsTourDetail: ['/Admin', ProtectRouteNames.NewsTourDetail, NEDRoutes.Detail].join('/'),
 
 }
@@ -71,39 +75,15 @@ export const ProtectRoutes = {
     Dashboard: {
         exact: true,
         id: ProtectRouteNames.Dashboard,
-        label: "Dashboard",
+        label: "Trang quản trị",
         path: AdminPaths.Dashboard,
         component: DashboardPage,
-        icon: HomeIcon
-    },
-    Customer: {
-        exact: true,
-        id: ProtectRouteNames.Customer,
-        label: "Customer",
-        path: AdminPaths.Customer,
-        component: CustomerPage,
-        icon: HomeIcon
-    },
-    CustomerNew: {
-        exact: true,
-        id: ProtectRouteNames.CustomerNew,
-        label: "Customer new",
-        path: AdminPaths.CustomerNew,
-        component: CreateCusPage,
-        icon: HomeIcon
-    },
-    CustomerDetail: {
-        exact: true,
-        id: ProtectRouteNames.CustomerDetail,
-        label: "Info Customer",
-        path: AdminPaths.CustomerDetail,
-        component: InfoCusPage,
         icon: HomeIcon
     },
     Employee: {
         exact: true,
         id: ProtectRouteNames.Employee,
-        label: "Employee",
+        label: "Quản trị nhân sự",
         path: AdminPaths.Employee,
         component: EmployeePage,
         icon: HomeIcon
@@ -124,10 +104,34 @@ export const ProtectRoutes = {
         component: EmpDetailPage,
         icon: HomeIcon
     },
+    Customer: {
+        exact: true,
+        id: ProtectRouteNames.Customer,
+        label: "Quản trị khách hàng",
+        path: AdminPaths.Customer,
+        component: CustomerPage,
+        icon: HomeIcon
+    },
+    CustomerNew: {
+        exact: true,
+        id: ProtectRouteNames.CustomerNew,
+        label: "Customer new",
+        path: AdminPaths.CustomerNew,
+        component: CreateCusPage,
+        icon: HomeIcon
+    },
+    CustomerDetail: {
+        exact: true,
+        id: ProtectRouteNames.CustomerDetail,
+        label: "Info Customer",
+        path: AdminPaths.CustomerDetail,
+        component: InfoCusPage,
+        icon: HomeIcon
+    },
     Tour: {
         exact: true,
         id: ProtectRouteNames.Tour,
-        label: "Tour",
+        label: "Quản trị tour",
         path: AdminPaths.Tour,
         component: ManageTourPage,
         icon: HomeIcon
@@ -151,7 +155,7 @@ export const ProtectRoutes = {
     NewsTour: {
         exact: true,
         id: ProtectRouteNames.NewsTour,
-        label: "NewsTour",
+        label: "Quản trị bài viết",
         path: AdminPaths.NewsTour,
         component: ManageNewsPage,
         icon: HomeIcon
@@ -171,5 +175,47 @@ export const ProtectRoutes = {
         path: AdminPaths.NewsTourDetail,
         component: ManageNewsDetailPage,
         icon: HomeIcon
+    },
+}
+
+export const ProtectRoutesDrawer = { 
+    Dashboard: {
+        exact: true,
+        id: ProtectRouteNames.Dashboard,
+        label: "Trang quản trị",
+        path: AdminPaths.Dashboard,
+        component: DashboardPage,
+        icon: HomeIcon
+    },
+    Employee: {
+        exact: true,
+        id: ProtectRouteNames.Employee,
+        label: "Quản trị nhân sự",
+        path: AdminPaths.Employee,
+        component: EmployeePage,
+        icon: PersonIcon
+    },
+    Customer: {
+        exact: true,
+        id: ProtectRouteNames.Customer,
+        label: "Quản trị khách hàng",
+        path: AdminPaths.Customer,
+        component: CustomerPage,
+        icon: PeopleIcon
+    },Tour: {
+        exact: true,
+        id: ProtectRouteNames.Tour,
+        label: "Quản trị tour",
+        path: AdminPaths.Tour,
+        component: ManageTourPage,
+        icon: PermMediaIcon
+    },
+    NewsTour: {
+        exact: true,
+        id: ProtectRouteNames.NewsTour,
+        label: "Quản trị bài viết",
+        path: AdminPaths.NewsTour,
+        component: ManageNewsPage,
+        icon: LibraryBooksIcon
     },
 }

@@ -121,7 +121,7 @@ export default function AdminNews() {
         <Container maxWidth='lg'>
             <Typography variant="h3">Quản lý tin du lịch</Typography>
             {/* tìm kiếm */}
-            <Grid container xs={12} spacing={2}>
+            <Grid container xs={12}>
                 <Grid item xs={5}>
                     <TextField
                         variant="outlined"
@@ -135,21 +135,24 @@ export default function AdminNews() {
                         onKeyDown={handleKeyDown}
                     />
                 </Grid>
-                <Grid item xs={7}>
+                <Grid item xs={2}>
                     <Button
-                        // fullWidth
+                        fullWidth
                         variant="contained"
                         color="primary"
-                        className={classes.submit}
+                        className={classes.search}
                         onClick={handleSearch}
                     >
                         <SearchIcon />
                     </Button>
+                </Grid>
+
+                <Grid item xs={5}>
                     <Button
-                        // fullWidth
+                        fullWidth
                         variant="contained"
                         color="primary"
-                        className={classes.submit}
+                        className={classes.btnCreate}
                         onClick={handleCreate}
                     >
                         Tạo mới

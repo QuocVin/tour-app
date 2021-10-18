@@ -7,7 +7,6 @@ import {
     Checkbox,
     Link,
     Grid,
-    Box,
     Typography,
     Container,
     Dialog,
@@ -22,20 +21,7 @@ import useSubmitForm from '../../helpers/CustomHooks'
 import { useHistory } from 'react-router';
 import { PublicRoutes } from '../../routes/public-route';
 
-function Copyright() {
-    return (
-        <Typography variant="body2" color="textSecondary" align="center">
-            {'Copyright © '}
-            <Link color="inherit" href="https://material-ui.com/">
-                Your Website
-            </Link>{' '}
-            {new Date().getFullYear()}
-            {'.'}
-        </Typography>
-    );
-}
-
-export default function Register(props) {
+export default function Register() {
     const classes = useStyles();
     const avatar = createRef();
     const history = useHistory()
@@ -80,7 +66,6 @@ export default function Register(props) {
 
     return (
         <div>
-
             <Container component="main" maxWidth="md">
                 <CssBaseline />
                 <div className={classes.paper}>
@@ -140,6 +125,7 @@ export default function Register(props) {
                                             <FormControlLabel
                                                 control={<Checkbox value="allowExtraEmails" color="primary" />}
                                                 label="Tôi chấp nhận chính sách bảo mật."
+                                                required
                                             />
                                         </Grid>
                                     </Grid>
@@ -264,9 +250,6 @@ export default function Register(props) {
                         </Grid>
                     </form>
                 </div>
-                <Box mt={5}>
-                    <Copyright />
-                </Box>
             </Container>
             <Dialog
                 open={open}

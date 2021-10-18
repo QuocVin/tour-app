@@ -1,44 +1,14 @@
-import React, { createRef, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-    makeStyles,
     Grid,
     Typography,
-    Divider,
     Container,
     Button,
-    DialogTitle,
-    DialogContentText,
-    DialogContent,
-    DialogActions,
-    Dialog,
     TextField,
-    Accordion,
-    AccordionSummary,
-    AccordionDetails,
-    ListSubheader,
-    List,
-    ListItem,
-    ListItemText,
-    Box,
-    CssBaseline,
-    FormControlLabel,
-    Checkbox,
-    Paper,
-    Table,
-    TableCell,
-    TableBody,
-    TableContainer,
-    TableHead,
-    TablePagination,
-    TableRow,
 } from '@material-ui/core';
-import useSubmitForm from '../../helpers/CustomHooks'
 import API, { endpoints } from '../../helpers/API';
 import { useStyles } from './Employee-styles';
-import { useStore } from "react-redux";
-import cookies from 'react-cookies';
 import { useHistory } from 'react-router';
-import Pagination from '@material-ui/lab/Pagination';
 import AppTable from '../../components/Table';
 import SearchIcon from '@material-ui/icons/Search';
 import { ProtectRoutes } from '../../routes/protect-route';
@@ -94,7 +64,6 @@ export default function Employee() {
     // tải trang
     useEffect(() => {
         async function init() {
-            // setLoading(true)
             await fetchUser()
         }
         init()
@@ -108,7 +77,7 @@ export default function Employee() {
             API.get(_path).then(res => {
                 setUsers(
                     res.data.map((b, idx) =>
-                        createData(idx + 1, b.last_name + ` ${b.first_name}` , b.username, b.email, b.phone, b.address, b.id),
+                        createData(idx + 1, b.last_name + ` ${b.first_name}`, b.username, b.email, b.phone, b.address, b.id),
                     )
                 );
                 setLoading(false)
@@ -153,7 +122,7 @@ export default function Employee() {
         <Container maxWidth='lg'>
             <Typography variant="h3">Quản lý nhân viên</Typography>
             {/* tìm kiếm */}
-            <Grid container xs={12} spacing={2}>
+            <Grid container xs={12}>
                 <Grid item xs={5}>
                     <TextField
                         autoComplete="username"
@@ -168,21 +137,25 @@ export default function Employee() {
                         onKeyDown={handleKeyDown}
                     />
                 </Grid>
+
                 <Grid item xs={2}>
                     <Button
                         fullWidth
                         variant="contained"
                         color="primary"
-                        className={classes.submit}
+                        className={classes.search}
                         onClick={handleSearch}
                     >
                         <SearchIcon />
                     </Button>
+                </Grid>
+                
+                <Grid item xs={5}>
                     <Button
-                        // fullWidth
+                        fullWidth
                         variant="contained"
                         color="primary"
-                        className={classes.submit}
+                        className={classes.btnCreate}
                         onClick={handleCreate}
                     >
                         Tạo mới

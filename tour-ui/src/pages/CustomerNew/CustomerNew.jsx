@@ -44,7 +44,7 @@ export default function CreateCustomer() {
         } else
             setOpenError(true)
 
-        if (avatar.current.files.length != 0) {
+        if (avatar.current.files.length !== 0) {
             formData.append("avatar", avatar.current.files[0]);
         }
         formData.append("role", "NGUOI DUNG");

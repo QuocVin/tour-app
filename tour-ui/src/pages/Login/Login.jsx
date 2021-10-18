@@ -1,14 +1,10 @@
 import React, { useState } from 'react';
-
 import {
     Button,
     CssBaseline,
     TextField,
-    FormControlLabel,
-    Checkbox,
     Link,
     Grid,
-    Box,
     Typography,
     Container,
 } from '@material-ui/core';
@@ -19,13 +15,10 @@ import { Redirect } from 'react-router';
 import { useDispatch } from 'react-redux';
 import { useStyles } from "./Login-styles";
 
-
 export default function Login(props) {
     const classes = useStyles();
     const [isLogged, setLogged] = useState(false);
     const dispatch = useDispatch();
-    const formData = new FormData();
-
 
     const login = async () => {
         try {
@@ -39,7 +32,6 @@ export default function Login(props) {
                 grant_type: "password",
             })
 
-            // console.info('res.data', res.data)
             cookies.save("access_token", res.data.access_token)
 
             let user = await API.get(endpoints['current-user'], {
@@ -47,7 +39,7 @@ export default function Login(props) {
                     Authorization: `Bearer ${cookies.load("access_token")}`
                 }
             })
-            // console.info('user.data', user.data)
+
             cookies.save("user", user.data);
             dispatch({
                 "type": "login",
@@ -61,7 +53,6 @@ export default function Login(props) {
 
     const { inputs, handleInputChange, handleSubmit } = useSubmitForm(login);
 
-
     if (isLogged)
         return <Redirect to="/" />
     else
@@ -72,7 +63,6 @@ export default function Login(props) {
                     <Typography component="h1" variant="h5">
                         Sign in
                     </Typography>
-                    {/* <form className={classes.form} noValidate method='POST' onSubmit={}> */}
                     <form className={classes.form} onSubmit={handleSubmit}>
                         <TextField
                             name="username"
@@ -96,13 +86,8 @@ export default function Login(props) {
                             margin="normal"
                             required
                             fullWidth
-                            autoComplete="current-password"
                             value={inputs.password}
                             onChange={handleInputChange}
-                        />
-                        <FormControlLabel
-                            control={<Checkbox value="remember" color="primary" />}
-                            label="Remember me"
                         />
                         <Button
                             type="submit"
@@ -111,14 +96,9 @@ export default function Login(props) {
                             color="primary"
                             className={classes.submit}
                         >
-                            Sign In
+                            Đăng nhâp
                         </Button>
                         <Grid container>
-                            <Grid item xs>
-                                <Link href="#" variant="body2">
-                                    Quên mật khẩu?
-                                </Link>
-                            </Grid>
                             <Grid item>
                                 <Link href="/Register" variant="body2">
                                     {"Bạn chưa có tài khoản? Đăng ký"}

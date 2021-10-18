@@ -1,10 +1,7 @@
 import React, { createRef, useEffect, useState } from 'react';
 import {
-    makeStyles,
     Grid,
     Typography,
-    Divider,
-    Container,
     Button,
     DialogTitle,
     DialogContentText,
@@ -12,25 +9,6 @@ import {
     DialogActions,
     Dialog,
     TextField,
-    Accordion,
-    AccordionSummary,
-    AccordionDetails,
-    ListSubheader,
-    List,
-    ListItem,
-    ListItemText,
-    Box,
-    CssBaseline,
-    FormControlLabel,
-    Checkbox,
-    Paper,
-    Table,
-    TableCell,
-    TableBody,
-    TableContainer,
-    TableHead,
-    TablePagination,
-    TableRow,
 } from '@material-ui/core';
 import useSubmitForm from '../../helpers/CustomHooks'
 import API, { endpoints } from '../../helpers/API';
@@ -39,6 +17,7 @@ import { useStore } from "react-redux";
 import cookies from 'react-cookies';
 import { useHistory } from 'react-router';
 import { PublicRoutes } from '../../routes/public-route';
+import AppTable from '../../components/Table';
 
 const columns = [
     { id: 'stt', label: 'STT', maxWidth: 20, align: 'center', },
@@ -80,7 +59,6 @@ export default function NewsTourDetail() {
     const avatar = createRef();
     const [loading, setLoading] = useState(false)
     const [booking, setBooking] = useState([]);
-    const [count, setCount] = useState(0);
 
     const store = useStore();
     const auth = store.getState();
@@ -91,7 +69,6 @@ export default function NewsTourDetail() {
 
     //  hiểu đơn giản là load trang
     useEffect(() => {
-        console.info('avatar', user.avatar)
         async function init() {
             setLoading(true)
             await fetchBooking()
@@ -103,17 +80,14 @@ export default function NewsTourDetail() {
     const fetchBooking = async () => {
         setTimeout(() => {
             const _path = endpoints['booking'] + endpoints['booking-current-user'] + `?customer=${user.id}`
-            // const _path = endpoints['booking'] + endpoints['booking-current-user'] + `?page=${page}` + `&customer=${user.id}`
             API.get(_path).then(res => {
-                setBooking(res.data)
-                setCount(res.data.length)
                 setBooking(
                     res.data.map((b, idx) =>
                         createData(idx + 1, b.static, b.people1 + ' người', b.people2 + ' bé', b.totalPrice + ' VNĐ', b.tour_id, b.employee_id),
                     )
                 );
-                setLoading(false)
             })
+            setLoading(false)
         }, 500);
     }
 
@@ -125,7 +99,7 @@ export default function NewsTourDetail() {
             formData.append(k, inputs[k]);
         }
 
-        if (avatar.current.files.length != 0) {
+        if (avatar.current.files.length !== 0) {
             formData.append("avatar", avatar.current.files[0]);
         }
 
@@ -162,23 +136,6 @@ export default function NewsTourDetail() {
         })
     }
 
-    // chuyển trang
-    const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = React.useState(10);
-
-    const handleChangePage = (event, newPage) => {
-        setPage(newPage);
-    };
-
-    const handleChangeRowsPerPage = (event) => {
-        setRowsPerPage(+event.target.value);
-        setPage(0);
-    };
-
-    const abc = () => {
-        console.info(inputs.last_name)
-    }
-
     // tắt thông báo và cập nhập lại thông tin người dùng sau khi thay đổi
     const handleCloseDialog = () => {
         setOpen(false);
@@ -190,7 +147,7 @@ export default function NewsTourDetail() {
         <Grid container spacing={8} xs={11}>
             {/* thông tin người dùng */}
             <Grid item xs={5}>
-                <Typography variant="h3" onClick={abc}>Thông tin người dùng</Typography>
+                <Typography variant="h3">Thông tin người dùng</Typography>
                 <form className={classes.form} onSubmit={handleSubmit}>
                     {/* <form className={classes.form} > */}
                     <Grid container spacing={2}>
@@ -314,51 +271,9 @@ export default function NewsTourDetail() {
             {/* lịch sử giao dịch */}
             <Grid item xs={7}>
                 <Typography variant="h3">Lịch sử giao dịch</Typography>
-                <Paper className={classes.root}>
-                    <TableContainer className={classes.container}>
-                        <Table stickyHeader aria-label="sticky table">
-                            <TableHead>
-                                <TableRow>
-                                    {columns.map((column) => (
-                                        <TableCell
-                                            key={column.id}
-                                            align={column.align}
-                                            style={{ minWidth: column.minWidth }}
-                                        >
-                                            {column.label}
-                                        </TableCell>
-                                    ))}
-                                </TableRow>
-                            </TableHead>
-                            <TableBody >
-                                {booking.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                                    return (
-                                        <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
-                                            {columns.map((column) => {
-                                                const value = row[column.id];
-                                                return (
-                                                    <TableCell key={column.id} align={column.align} onClick={() => handleChooseBooking(row.tourId, row.employeeId)}>
-                                                        {column.format && typeof value === 'number' ? column.format(value) : value}
-                                                    </TableCell>
-                                                );
-                                            })}
-                                        </TableRow>
-                                    );
-                                })}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-
-                    <TablePagination
-                        rowsPerPageOptions={[5, 10, 20]}
-                        component="div"
-                        count={booking.length}
-                        rowsPerPage={rowsPerPage}
-                        page={page}
-                        onPageChange={handleChangePage}
-                        onRowsPerPageChange={handleChangeRowsPerPage}
-                    />
-                </Paper>
+                {loading ? <p>Loading ...</p> :
+                    <AppTable columns={columns} data={booking} handleChooseBooking={handleChooseBooking} />
+                }
             </Grid>
 
             {/* xử lý thông báo khi cập nhập thông tin người dùng */}

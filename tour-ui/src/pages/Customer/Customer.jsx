@@ -1,42 +1,13 @@
-import React, { createRef, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-    makeStyles,
     Grid,
     Typography,
-    Divider,
     Container,
     Button,
-    DialogTitle,
-    DialogContentText,
-    DialogContent,
-    DialogActions,
-    Dialog,
     TextField,
-    Accordion,
-    AccordionSummary,
-    AccordionDetails,
-    ListSubheader,
-    List,
-    ListItem,
-    ListItemText,
-    Box,
-    CssBaseline,
-    FormControlLabel,
-    Checkbox,
-    Paper,
-    Table,
-    TableCell,
-    TableBody,
-    TableContainer,
-    TableHead,
-    TablePagination,
-    TableRow,
 } from '@material-ui/core';
-import useSubmitForm from '../../helpers/CustomHooks'
 import API, { endpoints } from '../../helpers/API';
 import { useStyles } from './Customer-styles';
-import { useStore } from "react-redux";
-import cookies from 'react-cookies';
 import { useHistory } from 'react-router';
 import AppTable from '../../components/Table';
 import SearchIcon from '@material-ui/icons/Search';
@@ -150,7 +121,7 @@ export default function Customer() {
         <Container maxWidth='lg'>
             <Typography variant="h3">Danh sách khách hàng</Typography>
             {/* tìm kiếm */}
-            <Grid container xs={12} spacing={2}>
+            <Grid container xs={12} >
                 <Grid item xs={5}>
                     <TextField
                         autoComplete="username"
@@ -166,23 +137,24 @@ export default function Customer() {
                     />
 
                 </Grid>
-                <Grid item xs={1}>
-                    <Button
-                        fullWidth
-                        variant="contained"
-                        color="primary"
-                        className={classes.submit}
-                        onClick={handleSearch}
-                    >
-                        <SearchIcon />
-                    </Button>
-                </Grid>
                 <Grid item xs={2}>
                     <Button
                         fullWidth
                         variant="contained"
                         color="primary"
-                        className={classes.submit}
+                        className={classes.search}
+                        onClick={handleSearch}
+                    >
+                        <SearchIcon />
+                    </Button>
+                </Grid>
+
+                <Grid item xs={5}>
+                    <Button
+                        fullWidth
+                        variant="contained"
+                        color="primary"
+                        className={classes.btnCreate}
                         onClick={handleCreate}
                     >
                         Tạo mới

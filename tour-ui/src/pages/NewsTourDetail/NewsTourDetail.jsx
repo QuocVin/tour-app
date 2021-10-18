@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {
-    makeStyles,
     Grid,
     Typography,
-    Divider,
     Container,
     Button,
     DialogTitle,
@@ -12,45 +10,19 @@ import {
     DialogActions,
     Dialog,
     TextField,
-    Accordion,
-    AccordionSummary,
-    AccordionDetails,
-    ListSubheader,
-    List,
-    ListItem,
-    ListItemText,
     Snackbar,
 } from '@material-ui/core';
+import {
+    MuiPickersUtilsProvider,
+    KeyboardDatePicker,
+} from '@material-ui/pickers';
+import MuiAlert from '@material-ui/lab/Alert';
+import DateFnsUtils from '@date-io/date-fns';
+import { useStyles } from './NewsTourDetail-styles';
 import { useHistory, useLocation } from 'react-router-dom';
 import API, { endpoints } from '../../helpers/API';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { useStore } from "react-redux";
 import cookies from 'react-cookies';
-import MuiAlert from '@material-ui/lab/Alert';
-
-const useStyles = makeStyles((theme) => ({
-    root: {
-        width: '100%',
-        maxWidth: 500,
-        backgroundColor: theme.palette.background.paper,
-    },
-    item: {
-        backgroundColor: "gainsboro",
-        marginBottom: "10px",
-    },
-    media: {
-        height: 140,
-    },
-    heading: {
-        fontSize: theme.typography.pxToRem(15),
-        fontWeight: theme.typography.fontWeightRegular,
-    },
-    paper: {
-        padding: theme.spacing(2),
-        textAlign: 'center',
-        color: theme.palette.text.secondary,
-    },
-}));
 
 function Alert(props) {
     return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -64,6 +36,7 @@ export default function NewsTourDetail() {
 
     const { state } = useLocation();
     const history = useHistory();
+    const [type, setType] = useState();
     const [tour, setTour] = useState([]);
     const [bookingInfo, setBookingInfo] = useState([]);
 
@@ -71,10 +44,6 @@ export default function NewsTourDetail() {
     const [people2, setPeople2] = useState(0);
     const [address1, setAddress1] = useState();
     const [address2, setAddress2] = useState();
-    const [likes, setLikes] = useState(0);
-
-
-    const [check, setCheck] = useState(false);
 
     const [loading, setLoading] = useState(false)
 
@@ -85,6 +54,8 @@ export default function NewsTourDetail() {
         user = cookies.load("user")
     };
 
+    const [check, setCheck] = useState(false);
+
     useEffect(() => {
         async function init() {
             setLoading(true)
@@ -93,7 +64,7 @@ export default function NewsTourDetail() {
                 if (user.username != null)
                     await fetchCheckBooking()
             }
-            // console.info(state?.newstour.rate)
+            console.info(state?.newstour)
         }
         init()
     }, [])
@@ -105,7 +76,7 @@ export default function NewsTourDetail() {
             API.get(_path).then(res => {
                 setTour(res.data)
                 setLoading(false)
-                // console.info(res.data)
+                setType(res.data.type[0].name)
                 setAddress1(res.data.address[0].name)
                 setAddress2(res.data.address[1].name)
             })
@@ -117,7 +88,7 @@ export default function NewsTourDetail() {
         setTimeout(() => {
             const _path = endpoints['booking'] + endpoints['check-booking'] + `?tour=${state?.newstour?.tour}&customer=${user.id}`;
             API.get(_path).then(res => {
-                if (res.data.length == 0)
+                if (res.data.length === 0)
                     setCheck(false)
                 else {
                     setCheck(true)
@@ -130,32 +101,52 @@ export default function NewsTourDetail() {
 
     // api post booking
     const booking = async () => {
-        try {
-            if (people1 == 0 && people2 == 0)
-                setOpen2(true)
-            else {
-                let pay = people1 * tour.price1 + people2 * tour.price2
-                const body = {
-                    "people1": people1,
-                    "people2": people2,
-                    "totalPrice": pay,
-                    "employee": `${state?.newstour?.employee}`,
-                    "customer": user.id,
-                    "tour": tour.id
-                }
-                let res = await API.post(endpoints['booking'], body)
-                setOpen3(true)
+        const formData = new FormData();
+        if (people1 === 0 && people2 === 0)
+            setOpen2(true)
+        else {
+            let pay = people1 * tour.price1 + people2 * tour.price2
+            // const body = {
+            //     "people1": people1,
+            //     "people2": people2,
+            //     "totalPrice": pay,
+            //     "employee": `${state?.newstour?.employee}`,
+            //     "customer": user.id,
+            //     "tour": tour.id,
+            //     "static": "DAT TOUR"
+            // }
+            formData.append("people1", people1);
+            formData.append("people2", people2);
+            formData.append("totalPrice", pay);
+            formData.append("employee", `${state?.newstour?.employee}`);
+            formData.append("customer", user.id);
+            formData.append("tour", tour.id);
+            formData.append("static", "DAT TOUR");
+
+            for (var key of formData.keys()) {
+                console.log(key, formData.get(key));
             }
-            console.info("type", people1)
-        } catch (err) {
-            console.info(err)
+
+            try {
+                const _path = endpoints["booking"]
+                let res = await API.post(_path, formData, {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                });
+                if (res)
+                    setOpen3(true)
+            } catch (err) {
+                console.log("ERROR:\n", err);
+            }
         }
+
     }
 
     // api patch booking - thay đổi thông tin
     const changeBooking = async () => {
         try {
-            if (people1 == 0 && people2 == 0)
+            if (people1 === 0 && people2 === 0)
                 setOpen2(true)
             else {
                 let pay = people1 * tour.price1 + people2 * tour.price2
@@ -215,21 +206,22 @@ export default function NewsTourDetail() {
         }
     };
 
+    // đóng cửa sổ thực hiện booking
     const handleClose_click = () => {
         setOpen(false);
     };
 
+    // lấy thông tin số người tham gia
     const handleChangePeople1 = (e) => {
         setPeople1(e.target.value)
     };
-
     const handleChangePeople2 = (e) => {
         setPeople2(e.target.value)
     };
 
+    // đóng thông báo sau khi thực hiện booking
     const handleClose = (event, reason) => {
         if (reason === 'clickaway') {
-            // return;
             setOpen2(false);
         }
     };
@@ -237,121 +229,198 @@ export default function NewsTourDetail() {
     return (
 
         <Container maxWidth='lg'>
-            <h1>{`${state?.newstour?.title}`}</h1>
+            <Typography variant="h3">{`${state?.newstour?.title}`}</Typography>
 
             {loading ? <p>Loading ...</p> :
                 (
-
-                    <Grid container spacing={3}>
-                        <Grid item xs={6}>
-                            <div>Đăng ngày {`${state?.newstour?.dateCreate}`}</div>
-                            <img src={`${state?.newstour?.image}`} alt={`${state?.newstour?.title}`} />
-
-                        </Grid>
-                        <Grid item xs={6}>
-                            <Accordion>
-                                <AccordionSummary
-                                    expandIcon={<ExpandMoreIcon />}
-                                    aria-controls="panel1a-content"
-                                    id="panel1a-header"
-                                >
-                                    <Typography className={classes.heading}>Mô tả</Typography>
-                                </AccordionSummary>
-                                <AccordionDetails>
-                                    <Typography>
-                                        {`${state?.newstour?.descriptions}`}
-                                    </Typography>
-                                </AccordionDetails>
-                            </Accordion>
-
-                            <List
-                                component="nav"
-                                aria-labelledby="nested-list-subheader"
-                                subheader={
-                                    <ListSubheader component="div" color="primary" id="nested-list-subheader">
-                                        Thông tin
-                                    </ListSubheader>
-                                }
-                                className={classes.root}
-                            >
-                                <ListItem button>
-                                    <ListItemText secondary="Điểm khởi hàng: " />
-                                    <ListItemText primary={address1} />
-                                </ListItem>
-                                <ListItem button>
-                                    <ListItemText secondary="Điểm đến: " />
-                                    <ListItemText primary={address2} />
-                                </ListItem>
-                                <ListItem button>
-                                    <ListItemText secondary="Giá vé người lớn: " />
-                                    <ListItemText primary={`${tour.price1} VNĐ`} />
-                                </ListItem>
-                                <ListItem button>
-                                    <ListItemText secondary="Giá vé trẻ em: " />
-                                    <ListItemText primary={`${tour.price2} VNĐ`} />
-                                </ListItem>
-                                <ListItem button >
-                                    <ListItemText secondary="Đến ngày: " />
-                                    <ListItemText primary={tour.dateEnd} />
-                                </ListItem>
-
-                            </List>
-
-                            <Button onClick={() => handlOpen_click()}>Đặt tour</Button>
-
-                            < Dialog open={open} onClose={handleClose_click} aria-labelledby="form-dialog-title">
-                                <DialogTitle id="form-dialog-title">Thông tin đơn hàng</DialogTitle>
-                                <DialogContent>
-                                    <DialogContentText>
-                                        To subscribe to this website, please enter your email address here. We will send updates
-                                        occasionally.
-                                    </DialogContentText>
-                                    <TextField
-                                        autoFocus
-                                        margin="dense"
-                                        id="people1"
-                                        label="Số lượng người lớn"
-                                        type="number"
-                                        fullWidth
-                                        value={people1}
-                                        onChange={handleChangePeople1}
-                                    />
-                                    <TextField
-                                        autoFocus
-                                        margin="dense"
-                                        id="name"
-                                        label="Số lượng trẻ em"
-                                        type="number"
-                                        fullWidth
-                                        value={people2}
-                                        onChange={handleChangePeople2}
-                                    />
-
-                                </DialogContent>
-                                <DialogActions>
-                                    <Button onClick={handleClose_click} color="primary">Quay lại</Button>
-                                    {check ? (
-                                        <div>
-                                            <Button onClick={() => handleCancle_click()}>Hủy đơn hàng</Button>
-                                            <Button onClick={() => handleChange_click()}>Thay đổi</Button>
-                                        </div>
-                                    ) : (
-                                        <div>
-                                            <Button onClick={() => handleBooking_click()} color="primary">Hoàn thành</Button>
-                                        </div>
-                                    )}
-                                </DialogActions>
-                            </Dialog>
-
+                    <Grid container spacing={10}>
+                        {/* thông tin về bài viết */}
+                        <Grid item xs={8}>
+                            <Grid container>
+                                <img className={classes.img} src={`${state?.newstour?.image}`} alt={`${state?.newstour?.title}`} />
+                            </Grid>
+                            <Typography variant="body">Đăng ngày {`${state?.newstour?.dateCreate}`}</Typography>
+                            <TextField
+                                variant="outlined"
+                                fullWidth
+                                minRows={10}
+                                multiline
+                                readOnly
+                                className={classes.descriptions}
+                                value={`${state?.newstour?.descriptions}`}
+                            />
                         </Grid>
 
+                        {/* các thông tin về tour trong bài */}
+                        <Grid item xs={4} className={classes.tour}>
+                            <Grid container xs={12} spacing={2} className={classes.tourInfo}>
+                                <Typography className={classes.tourTitle} variant="h5">Thông tin về tour du lịch</Typography>
+                                {/* chọn tour để viết bài */}
+                                <Grid item xs={12} >
+                                    <TextField
+                                        variant="outlined"
+                                        fullWidth
+                                        readOnly
+                                        label="Tiêu đề tour"
+                                        value={tour.title + ''}
+                                    />
+                                </Grid>
+
+                                {/* hình thức */}
+                                <Grid item xs={8} >
+                                    <TextField
+                                        variant="outlined"
+                                        fullWidth
+                                        readOnly
+                                        label="Hình thức"
+                                        value={type + ''}
+                                    />
+                                </Grid>
+                            </Grid>
+                            <Grid container xs={12} spacing={2} className={classes.tourInfo}>
+                                {/* ngày bắt đầu */}
+                                <Grid item xs={6}>
+                                    <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                                        <KeyboardDatePicker
+                                            disableToolbar
+                                            variant="inline"
+                                            format="dd/MM/yyyy"
+                                            margin="normal"
+                                            id="dateStart"
+                                            label="Ngày bắt đầu"
+                                            value={tour.dateStart}
+                                            readOnly
+                                            KeyboardButtonProps={{
+                                                'aria-label': 'change date',
+                                            }}
+                                        />
+                                    </MuiPickersUtilsProvider>
+                                </Grid>
+
+                                {/* ngày kết thúc */}
+                                <Grid item xs={6}>
+                                    <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                                        <KeyboardDatePicker
+                                            disableToolbar
+                                            variant="inline"
+                                            format="dd/MM/yyyy"
+                                            margin="normal"
+                                            id="dateEnd"
+                                            label="Ngày kết thúc"
+                                            value={tour.dateEnd}
+                                            readOnly
+                                            KeyboardButtonProps={{
+                                                'aria-label': 'change date',
+                                            }}
+                                        />
+                                    </MuiPickersUtilsProvider>
+                                </Grid>
+
+                                {/* điểm xuất phát */}
+                                <Grid item xs={6} >
+                                    <TextField
+                                        variant="outlined"
+                                        fullWidth
+                                        id="pointStart"
+                                        label="Điểm xuất phát"
+                                        readOnly
+                                        value={address1 + ''}
+                                    />
+                                </Grid>
+
+                                {/* điểm đến */}
+                                <Grid item xs={6} >
+                                    <TextField
+                                        variant="outlined"
+                                        fullWidth
+                                        id="pointEnd"
+                                        label="Điểm đến"
+                                        readOnly
+                                        value={address2 + ''}
+                                    />
+                                </Grid>
+
+                                {/* giá vé */}
+                                <Grid item xs={6}>
+                                    <TextField
+                                        variant="outlined"
+                                        fullWidth
+                                        id="price1"
+                                        readOnly
+                                        label="Giá vé cho người lớn"
+                                        value={tour.price1 + ' VNĐ'}
+                                    />
+                                </Grid>
+                                <Grid item xs={6}>
+                                    <TextField
+                                        variant="outlined"
+                                        fullWidth
+                                        id="price2"
+                                        label="Giá vé cho trẻ em"
+                                        readOnly
+                                        value={tour.price2 + ' VNĐ'}
+                                    />
+                                </Grid>
+                            </Grid>
+
+                            <Grid container xs={12} className={classes.booking}>
+                                <Button
+                                    fullWidth
+                                    variant="contained"
+                                    className={classes.btnBooking}
+                                    onClick={() => handlOpen_click()}>Đặt tour</Button>
+                            </Grid>
+                        </Grid>
                     </Grid>
-
-
                 )
             }
 
+            {/* hiện cửa sổ nhập thông tin */}
+            < Dialog open={open} onClose={handleClose_click} aria-labelledby="form-dialog-title">
+                <DialogTitle id="form-dialog-title">Thông tin đơn hàng</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        To subscribe to this website, please enter your email address here. We will send updates
+                        occasionally.
+                    </DialogContentText>
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        id="people1"
+                        label="Số lượng người lớn"
+                        type="number"
+                        fullWidth
+                        value={people1}
+                        onChange={handleChangePeople1}
+                    />
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        id="name"
+                        label="Số lượng trẻ em"
+                        type="number"
+                        fullWidth
+                        value={people2}
+                        onChange={handleChangePeople2}
+                    />
 
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleClose_click} color="primary">Quay lại</Button>
+                    {check ? (
+                        <div>
+                            <Button onClick={() => handleCancle_click()}>Hủy đơn hàng</Button>
+                            <Button onClick={() => handleChange_click()}>Thay đổi</Button>
+                        </div>
+                    ) : (
+                        <div>
+                            <Button onClick={() => handleBooking_click()} color="primary">Hoàn thành</Button>
+                        </div>
+                    )}
+                </DialogActions>
+            </Dialog>
+
+            {/* xử lý thông báo sau khi booking */}
             <Snackbar open={open2} autoHideDuration={6000} onClose={handleClose}>
                 <Alert onClose={handleClose} severity="warning">
                     Lỗi! Bạn phải nhập số người

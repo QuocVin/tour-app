@@ -15,6 +15,7 @@ import API, { endpoints } from '../../helpers/API';
 import useSubmitForm from '../../helpers/CustomHooks'
 import { useHistory, useLocation } from 'react-router';
 import { ProtectRoutes } from '../../routes/protect-route';
+import { PublicRoutes } from '../../routes/public-route';
 import AppTable from '../../components/Table';
 
 const columns = [
@@ -163,7 +164,7 @@ export default function InfoCustomer() {
             formData.append(k, inputs[k]);
         }
 
-        if (avatar.current.files.length != 0) {
+        if (avatar.current.files.length !== 0) {
             formData.append("avatar", avatar.current.files[0]);
         }
 
@@ -205,10 +206,16 @@ export default function InfoCustomer() {
         })
     }
 
-    // xử lý khi chọn giao dịch khách hàng để tránh bị lỗi
-    const handleChooseBooking = () => {
-        console.info('đã chọn')
-    };
+    // chuyển về trang đăng tin tức tour đã booking
+    const handleChooseBooking = (tourId, employeeId) => {
+        const _pathAPI = endpoints['news-tour'] + endpoints['have-tour'] + `?tour=${tourId}&employee=${employeeId}`;
+        API.get(_pathAPI).then(res => {
+            const _pathPage = PublicRoutes.NewsTourDetail.path.replace(":id", res.data[0].id)
+            history.push(_pathPage, {
+                newstour: res.data[0],
+            })
+        })
+    }
 
     // chức năng tìm kiếm nhân viên theo email
     const handleChangeEmail = (e) => {
@@ -385,14 +392,14 @@ export default function InfoCustomer() {
                     {/* các giao dịch liên quan */}
                     <Typography variant="h5">Các giao dịch với khách hàng</Typography>
                     {loading ? <p>Loading ...</p> :
-                        <AppTable columns={columnsBooking} data={booking} handleChoose={handleChooseBooking} />
+                        <AppTable columns={columnsBooking} data={booking} handleChooseBooking={handleChooseBooking} />
                     }
                 </Grid>
             </Grid>
 
             <Typography variant="h5">Các bài viết đã đăng</Typography>
             {/* tìm kiếm */}
-            <Grid container xs={12} spacing={2}>
+            <Grid container xs={12}>
                 <Grid item xs={5}>
                     <TextField
                         autoComplete="username"
@@ -412,16 +419,19 @@ export default function InfoCustomer() {
                         fullWidth
                         variant="contained"
                         color="primary"
-                        className={classes.submit}
+                        className={classes.search}
                         onClick={handleSearch}
                     >
                         <SearchIcon />
                     </Button>
+                </Grid>
+
+                <Grid item xs={5}>
                     <Button
-                        // fullWidth
+                        fullWidth
                         variant="contained"
                         color="primary"
-                        className={classes.submit}
+                        className={classes.btnCreate}
                         onClick={handleCreate}
                     >
                         Tạo mới
