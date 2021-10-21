@@ -7,18 +7,32 @@ import {
     Grid,
     Typography,
     Container,
+    Snackbar,
 } from '@material-ui/core';
+import MuiAlert from '@material-ui/lab/Alert';
 import useSubmitForm from '../../helpers/CustomHooks';
 import API, { endpoints } from '../../helpers/API';
 import cookies from 'react-cookies';
 import { Redirect } from 'react-router';
+import { useHistory } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { useStyles } from "./Login-styles";
+import { setAuthLS, LS_KEY } from "../../helpers/localStorage";
 
-export default function Login(props) {
+function Alert(props) {
+    return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
+
+export default function Login() {
     const classes = useStyles();
-    const [isLogged, setLogged] = useState(false);
+    const history = useHistory();
     const dispatch = useDispatch();
+    const [isLogged, setLogged] = useState(false);
+    const [open, setOpen] = useState(false);
+
+    const signInSucess = (role) => {
+        setAuthLS(LS_KEY.AUTH_TOKEN, role);
+    }
 
     const login = async () => {
         try {
@@ -41,17 +55,25 @@ export default function Login(props) {
             })
 
             cookies.save("user", user.data);
+            signInSucess(user.data.role);
             dispatch({
                 "type": "login",
                 "payload": user.data
             })
             setLogged(true);
+            window.location.reload();
         } catch (err) {
+            setOpen(true)
             console.info(err)
         }
     }
 
     const { inputs, handleInputChange, handleSubmit } = useSubmitForm(login);
+
+    // xử lý tắt thông báo
+    const handleCloseAlert = () => {
+        setOpen(false);
+    };
 
     if (isLogged)
         return <Redirect to="/" />
@@ -107,6 +129,13 @@ export default function Login(props) {
                         </Grid>
                     </form>
                 </div>
+
+                {/* xử lý thông báo khi đăng nhâp thất bại */}
+                <Snackbar open={open} autoHideDuration={6000} onClose={handleCloseAlert}>
+                    <Alert onClose={handleCloseAlert} severity="warning">
+                        Sai tài khoản hoặc mật khẩu!!!
+                    </Alert>
+                </Snackbar>
             </Container>
         );
 }

@@ -8,12 +8,13 @@ import {
     Button,
     Avatar,
 } from "@material-ui/core";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useHistory } from "react-router";
 import MenuIcon from "@material-ui/icons/Menu";
 import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos"
 import { useStore } from "react-redux";
 import cookies from 'react-cookies';
+import { clearAuthLS } from '../../helpers/localStorage'
 
 export default function ({ classes, open, setOpen, mainRef }) {
     const trigger = useScrollTrigger({ target: mainRef });
@@ -25,12 +26,17 @@ export default function ({ classes, open, setOpen, mainRef }) {
     if (cookies.load("user") != null) {
         user = cookies.load("user")
     };
+    
+    const signOut = () => {
+        clearAuthLS();
+    }
 
     const handleLogout_click = () => {
         cookies.remove("user");
         cookies.remove("access_token");
+        signOut();
         history.push('/');
-        window.location.reload();
+        // window.location.reload();
     };
 
     const handleLogin_click = (path) => {

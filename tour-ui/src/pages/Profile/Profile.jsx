@@ -260,10 +260,6 @@ export default function NewsTourDetail() {
                     >
                         Cập nhập
                     </Button>
-                    {/* <Button color="primary" autoFocus>
-            Sign Up
-          </Button> */}
-
                 </form>
 
             </Grid>

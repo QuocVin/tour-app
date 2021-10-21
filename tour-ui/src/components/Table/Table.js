@@ -1,28 +1,5 @@
-import React, { createRef, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
-    makeStyles,
-    Grid,
-    Typography,
-    Divider,
-    Container,
-    Button,
-    DialogTitle,
-    DialogContentText,
-    DialogContent,
-    DialogActions,
-    Dialog,
-    TextField,
-    Accordion,
-    AccordionSummary,
-    AccordionDetails,
-    ListSubheader,
-    List,
-    ListItem,
-    ListItemText,
-    Box,
-    CssBaseline,
-    FormControlLabel,
-    Checkbox,
     Paper,
     Table,
     TableCell,
@@ -32,12 +9,7 @@ import {
     TablePagination,
     TableRow,
 } from '@material-ui/core';
-import useSubmitForm from '../../helpers/CustomHooks'
-import API, { endpoints } from '../../helpers/API';
 import { useStyles } from './Table-style';
-import { useStore } from "react-redux";
-import cookies from 'react-cookies';
-import { useHistory } from 'react-router';
 
 export default function AppTable({ columns, data, handleChoose, handleChooseBooking }) {
     const classes = useStyles();

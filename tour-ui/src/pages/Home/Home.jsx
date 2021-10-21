@@ -17,7 +17,6 @@ import { PublicRoutes } from '../../routes/public-route'
 import SearchIcon from '@material-ui/icons/Search';
 import { useStyles } from './Home-styles';
 
-
 export default function Test() {
     const classes = useStyles();
     const history = useHistory()

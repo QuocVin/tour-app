@@ -71,6 +71,7 @@ export const AdminPaths = {
 
 }
 
+// tất cả các route trong protect
 export const ProtectRoutes = {
     Dashboard: {
         exact: true,
@@ -178,7 +179,8 @@ export const ProtectRoutes = {
     },
 }
 
-export const ProtectRoutesDrawer = { 
+// các route hiện trên drawer cho admin
+export const ProtectRoutesDrawer = {
     Dashboard: {
         exact: true,
         id: ProtectRouteNames.Dashboard,
@@ -202,7 +204,7 @@ export const ProtectRoutesDrawer = {
         path: AdminPaths.Customer,
         component: CustomerPage,
         icon: PeopleIcon
-    },Tour: {
+    }, Tour: {
         exact: true,
         id: ProtectRouteNames.Tour,
         label: "Quản trị tour",
@@ -217,5 +219,116 @@ export const ProtectRoutesDrawer = {
         path: AdminPaths.NewsTour,
         component: ManageNewsPage,
         icon: LibraryBooksIcon
+    },
+}
+
+// các route hiện trên drawer cho nhân viên
+export const EmpRoutesDrawer = {
+    Customer: {
+        exact: true,
+        id: ProtectRouteNames.Customer,
+        label: "Quản trị khách hàng",
+        path: AdminPaths.Customer,
+        component: CustomerPage,
+        icon: PeopleIcon
+    }, Tour: {
+        exact: true,
+        id: ProtectRouteNames.Tour,
+        label: "Quản trị tour",
+        path: AdminPaths.Tour,
+        component: ManageTourPage,
+        icon: PermMediaIcon
+    },
+    NewsTour: {
+        exact: true,
+        id: ProtectRouteNames.NewsTour,
+        label: "Quản trị bài viết",
+        path: AdminPaths.NewsTour,
+        component: ManageNewsPage,
+        icon: LibraryBooksIcon
+    },
+}
+
+// các route cho phép nhân viên truy cập trong protet
+export const EmployeeRoutes = {
+    EmployeeDetail: {
+        exact: true,
+        id: ProtectRouteNames.EmployeeDetail,
+        label: "EmployeeDetail",
+        path: AdminPaths.EmployeeDetail,
+        component: EmpDetailPage,
+        icon: HomeIcon
+    },
+    Customer: {
+        exact: true,
+        id: ProtectRouteNames.Customer,
+        label: "Quản trị khách hàng",
+        path: AdminPaths.Customer,
+        component: CustomerPage,
+        icon: HomeIcon
+    },
+    CustomerNew: {
+        exact: true,
+        id: ProtectRouteNames.CustomerNew,
+        label: "Customer new",
+        path: AdminPaths.CustomerNew,
+        component: CreateCusPage,
+        icon: HomeIcon
+    },
+    CustomerDetail: {
+        exact: true,
+        id: ProtectRouteNames.CustomerDetail,
+        label: "Info Customer",
+        path: AdminPaths.CustomerDetail,
+        component: InfoCusPage,
+        icon: HomeIcon
+    },
+    Tour: {
+        exact: true,
+        id: ProtectRouteNames.Tour,
+        label: "Quản trị tour",
+        path: AdminPaths.Tour,
+        component: ManageTourPage,
+        icon: HomeIcon
+    },
+    TourNew: {
+        exact: true,
+        id: ProtectRouteNames.TourNew,
+        label: "TourNew",
+        path: AdminPaths.TourNew,
+        component: ManageTourNewPage,
+        icon: HomeIcon
+    },
+    TourDetail: {
+        exact: true,
+        id: ProtectRouteNames.TourDetail,
+        label: "TourDetail",
+        path: AdminPaths.TourDetail,
+        component: ManageTourDetailPage,
+        icon: HomeIcon
+    },
+    NewsTour: {
+        exact: true,
+        id: ProtectRouteNames.NewsTour,
+        label: "Quản trị bài viết",
+        path: AdminPaths.NewsTour,
+        component: ManageNewsPage,
+        icon: HomeIcon
+    },
+    NewsTourCre: {
+        exact: true,
+        id: ProtectRouteNames.NewsTourCre,
+        label: "NewsTourCre",
+        path: AdminPaths.NewsTourCre,
+        component: ManageNewsCrePage,
+        icon: HomeIcon
+    },
+    NewsTourDetail: {
+        exact: true,
+        id: ProtectRouteNames.NewsTourDetail,
+        label: "NewsTourDetail",
+        path: AdminPaths.NewsTourDetail,
+        component: ManageNewsDetailPage,
+        icon: HomeIcon
     },
 }

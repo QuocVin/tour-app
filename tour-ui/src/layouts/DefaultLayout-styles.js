@@ -46,6 +46,7 @@ export const useStyles = makeStyles((theme) => ({
   drawerPaper: {
     width: drawerWidth,
     borderRight: 0,
+    backgroundColor: '#ebfae8',
   },
   drawerContainer: {
     overflow: "auto",
@@ -70,6 +71,17 @@ export const useStyles = makeStyles((theme) => ({
       duration: theme.transitions.duration.enteringScreen,
     }),
     marginLeft: 0,
+  },
+  avatar: {
+    width: 100,
+    height: 100,
+    margin: 'auto',
+    marginTop: 50,
+    marginBottom: 10,
+  },
+  role: {
+    textAlign: 'center',
+    marginBottom: '25',
   },
 
   // header

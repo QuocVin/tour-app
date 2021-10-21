@@ -15,11 +15,14 @@ class User(AbstractUser):
         db_table = 'user'
 
     # Biến static để đánh dấu vai trò người dùng
-    EMPLOYEE = 'NHAN VIEN'
     CUSTOMER = 'NGUOI DUNG'
+    EMPLOYEE = 'NHAN VIEN'
+    ADMIN = 'QUAN LY'
+
     ROLE = [
-        (EMPLOYEE, 'nhan vien'),
         (CUSTOMER, 'nguoi dung'),
+        (EMPLOYEE, 'nhan vien'),
+        (ADMIN, 'quan ly'),
     ]
 
     email = models.CharField(max_length=50, null=False, unique=True)
