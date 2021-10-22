@@ -33,7 +33,9 @@ export default function ({ children, setToken, ...rest }) {
         <DrawerComponent classes={classes} open={openDrawer} />
       );
     } else
-      return
+      return (
+        <DrawerComponent classes={classes} open={false} />
+      );
   }
 
   return (

@@ -7,6 +7,11 @@ import {
     TextField,
     CssBaseline,
     Snackbar,
+    DialogTitle,
+    DialogContentText,
+    DialogContent,
+    DialogActions,
+    Dialog,
 } from '@material-ui/core';
 import {
     MuiPickersUtilsProvider,
@@ -19,6 +24,45 @@ import API, { endpoints } from '../../helpers/API';
 import useSubmitForm from '../../helpers/CustomHooks'
 import { useHistory, useLocation } from 'react-router';
 import { ProtectRoutes } from '../../routes/protect-route';
+import AppTable from '../../components/Table';
+import { PublicRoutes } from '../../routes/public-route';
+
+const columns = [
+    { id: 'stt', label: 'STT', maxWidth: 20, align: 'center', },
+    {
+        id: 'static1',
+        label: 'Trạng thái',
+        minWidth: 100,
+        align: 'center',
+    },
+    {
+        id: 'people1',
+        label: 'Người lớn',
+        minWidth: 100,
+        align: 'right',
+    },
+    {
+        id: 'people2',
+        label: 'Trẻ em',
+        minWidth: 100,
+        align: 'right',
+    },
+    {
+        id: 'total',
+        label: 'Tổng tiền',
+        minWidth: 150,
+        align: 'right',
+        format: (value) => value.toFixed(2),
+    },
+];
+
+function createData(stt, static1, people1, people2, total, tourId, employeeId) {
+    return { stt, static1, people1, people2, total, tourId, employeeId };
+}
+
+function createData1(stt, static1, people1, people2, total, userId) {
+    return { stt, static1, people1, people2, total, userId };
+}
 
 function Alert(props) {
     return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -37,12 +81,16 @@ export default function NewsDetail() {
 
     const [news, setNews] = useState([]);
     const [descriptions, setDescriptions] = useState('');
+    const [booking, setBooking] = useState([]);
     const hanleChangeDes = (e) => {
         setDescriptions(e.target.value);
     }
 
+    const [userInfo, setUserInfo] = useState([]);
+
     const [open, setOpen] = useState(false);
     const [open2, setOpen2] = useState(false);
+    const [openInfo, setOpenInfo] = useState(false);
     const [loading, setLoading] = useState(false)
 
     // lấy thời gian ngày hiện tại
@@ -59,6 +107,7 @@ export default function NewsDetail() {
         async function init() {
             await fetchNews()
             await fetchTourInNews()
+            await fetchBooking()
         }
         init()
     }, [])
@@ -88,6 +137,43 @@ export default function NewsDetail() {
             })
             setLoading(false)
         }, 500);
+    }
+
+    // lấy danh sách booking đã thực hiện trong bài viết
+    const fetchBooking = () => {
+        setTimeout(() => {
+            const _pathAPI = endpoints['booking'] + endpoints['news-have'] + `?tour=${state?.tourId}&employee=${state?.employeeId}`
+            API.get(_pathAPI).then(res => {
+                setBooking(
+                    res.data.map((b, idx) =>
+                        createData1(idx + 1, b.static, b.people1 + ' người', b.people2 + ' bé', b.totalPrice + ' VNĐ', b.customer_id),
+                        // createData(idx + 1, b.static, b.people1 + ' người', b.people2 + ' bé', b.totalPrice + ' VNĐ', b.tour_id, b.employee_id),
+                    )
+                )
+            })
+            setLoading(false);
+        }, 500);
+    }
+
+    // chuyển về trang đăng tin tức tour đã booking
+    const handleChooseBooking = (tourId, employeeId) => {
+        const _pathAPI = endpoints['news-tour'] + endpoints['have-tour'] + `?tour=${tourId}&employee=${employeeId}`;
+        API.get(_pathAPI).then(res => {
+            const _pathPage = PublicRoutes.NewsTourDetail.path.replace(":id", res.data[0].id)
+            history.push(_pathPage, {
+                newstour: res.data[0],
+            })
+        })
+    }
+
+    // hiển thị thông tin khách hàng đã booking
+    const handleViewInfoUser = (userId) => {
+        const _pathAPI = endpoints['user'] + endpoints['is-booking'] + `?id=${userId}`;
+        API.get(_pathAPI).then(res => {
+            setUserInfo(res.data[0])
+            setOpenInfo(true);
+            // console.info(res.data[0])
+        })
     }
 
     // api patch thay đổi thông tin bài viết
@@ -163,6 +249,18 @@ export default function NewsDetail() {
         setOpen(false);
         setOpen2(false);
         window.location.reload();
+    };
+
+    // đóng cửa sổ thông tin khách hàng
+    // const handleClose_click = () => {
+    //     setOpenInfo(false);
+    // };
+
+    const handleClose_click = (event, reason) => {
+        if (reason === 'clickaway') {
+            setOpenInfo(false);
+        }
+        setOpenInfo(false);
     };
 
     return (
@@ -425,7 +523,67 @@ export default function NewsDetail() {
                         </Grid>
                     </form>
                 </div>
+
+                {/* lịch sử hoạt động */}
+                <Grid item xs={12}>
+                    {/* <Typography variant="h4">Lịch sử hoạt động</Typography> */}
+
+                    {/* các giao dịch liên quan */}
+                    <Typography variant="h5">Các giao dịch với khách hàng</Typography>
+                    {loading ? <p>Loading ...</p> :
+                        <AppTable columns={columns} data={booking} handleChoose={handleViewInfoUser} />
+                        // <AppTable columns={columns} data={booking} handleChooseBooking={handleChooseBooking} />
+                    }
+                </Grid>
             </Container>
+
+            {/* hiện cửa sổ nhập thông tin */}
+            < Dialog className={classes.info} open={openInfo} onClose={handleClose_click} aria-labelledby="form-dialog-title">
+                <DialogTitle className={classes.infoHeader} id="form-dialog-title">Thông tin khách hàng</DialogTitle>
+                <DialogContent>
+                    <TextField
+                        variant="outlined"
+                        margin="dense"
+                        id="people1"
+                        label="Tên người dùng"
+                        fullWidth
+                        readOnly
+                        value={userInfo.last_name + ` ${userInfo.first_name}`}
+                    />
+                    <TextField
+                        variant="outlined"
+                        margin="dense"
+                        id="name"
+                        label="số điện thoại"
+                        fullWidth
+                        readOnly
+                        value={userInfo.phone}
+                    />
+                    <TextField
+                        variant="outlined"
+                        margin="dense"
+                        id="name"
+                        label="Email"
+                        fullWidth
+                        readOnly
+                        value={userInfo.email}
+                    />
+                    <TextField
+                        variant="outlined"
+                        margin="dense"
+                        id="name"
+                        label="Địa chỉ"
+                        fullWidth
+                        readOnly
+                        multiline
+                        minRows={3}
+                        value={userInfo.address}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleClose_click} color="primary">Quay lại</Button>
+                </DialogActions>
+            </Dialog>
 
             {/* xử lý thông báo */}
             <Snackbar open={open} autoHideDuration={6000} onClose={handleCloseAlert}>

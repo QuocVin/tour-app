@@ -86,34 +86,6 @@ export default function CreateTour(props) {
         setDateEnd(date);
     };
 
-    // const createType = async () => {
-    //     const formData = new FormData();
-    //     formData.append("type", inputs["type"]);
-    //     try {
-    //         let res = await API.post(endpoints["type"], formData, {
-    //             headers: {
-    //                 "Content-Type": "multipart/form-data",
-    //             },
-    //         });
-    //     } catch (err) {
-    //         console.log("ERROR:\n", err);
-    //     }
-    // };
-
-    // const createAddress = async (value) => {
-    //     const formData = new FormData();
-    //     formData.append("type", inputs["type"]);
-    //     try {
-    //         let res = await API.post(endpoints["type"], formData, {
-    //             headers: {
-    //                 "Content-Type": "multipart/form-data",
-    //             },
-    //         });
-    //     } catch (err) {
-    //         console.log("ERROR:\n", err);
-    //     }
-    // };
-
     // api post tạo mới tour
     const create = async () => {
         const formData = new FormData();

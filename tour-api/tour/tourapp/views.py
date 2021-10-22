@@ -90,6 +90,18 @@ class UserViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.UpdateAPIVi
         return Response({"invalid request": "not found"},
                         status.HTTP_400_BAD_REQUEST)
 
+    # API lấy thông tin khách hàng đã thực hiện booking
+    @action(methods=['get'], detail=False, url_path='is-booking')
+    def check_booking(self, request):
+        if request.query_params.__contains__('id'):
+            query = User.objects.filter(
+                id=request.query_params.__getitem__('id'),
+                role='NGUOI DUNG',
+            )
+            return Response(list(query.values()))
+        return Response({"invalid request": "not found"},
+                        status.HTTP_400_BAD_REQUEST)
+
     def create(self, request, *args, **kwargs):
 
         # ghi đè lại create
@@ -243,3 +255,31 @@ class BookingViewSet(viewsets.ViewSet, generics.CreateAPIView,
             return Response(list(query.values()))
         return Response({"invalid request": "not found"},
                     status.HTTP_400_BAD_REQUEST)
+
+    # danh sách booking đã thực hiện trong bài viết
+    @action(methods=['get'], detail=False, url_path='news-have')
+    def news_booking(self, request):
+        if request.query_params.__contains__('tour') and request.query_params.__contains__('employee'):
+            query = Booking.objects.filter(
+                employee=request.query_params.__getitem__('employee'),
+                tour=request.query_params.__getitem__('tour')
+            )
+            return Response(list(query.values()))
+        return Response({"invalid request": "not found"},
+                        status.HTTP_400_BAD_REQUEST)
+
+    # chart - thống kê booking theo năm
+    @action(methods=['get'], detail=False, url_path='year-booking')
+    def chart_booking2(self, request):
+        month = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+        if request.query_params.__contains__('year'):
+            query = Booking.objects.filter(
+                dateBooking__year=request.query_params.__getitem__('year')
+            )
+            data1 = []
+            for m in month:
+                data1.append(query.filter(dateBooking__month=m).count())
+
+            return Response(data1)
+        return Response({"invalid request": "not found"},
+                        status.HTTP_400_BAD_REQUEST)

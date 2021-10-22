@@ -33,6 +33,7 @@ export default function NewsTourDetail() {
     const [open, setOpen] = useState(false);
     const [open2, setOpen2] = useState(false);
     const [open3, setOpen3] = useState(false);
+    const [open4, setOpen4] = useState(false);
 
     const { state } = useLocation();
     const history = useHistory();
@@ -54,6 +55,11 @@ export default function NewsTourDetail() {
         user = cookies.load("user")
     };
 
+    // lấy thời gian ngày hiện tại
+    const current = new Date();
+    const date = `${current.getFullYear()}-${current.getMonth() + 1}-${current.getDate()}`
+    const dateBooking = useState(new Date(date));
+
     const [check, setCheck] = useState(false);
 
     useEffect(() => {
@@ -64,7 +70,6 @@ export default function NewsTourDetail() {
                 if (user.username != null)
                     await fetchCheckBooking()
             }
-            console.info(state?.newstour)
         }
         init()
     }, [])
@@ -122,6 +127,7 @@ export default function NewsTourDetail() {
             formData.append("customer", user.id);
             formData.append("tour", tour.id);
             formData.append("static", "DAT TOUR");
+            formData.append("dateBooking", dateBooking);
 
             for (var key of formData.keys()) {
                 console.log(key, formData.get(key));
@@ -154,7 +160,8 @@ export default function NewsTourDetail() {
                     "people1": people1,
                     "people2": people2,
                     "totalPrice": pay,
-                    "static": "DAT TOUR"
+                    "static": "DAT TOUR",
+                    "dateBooking": dateBooking,
                 }
                 const _path = endpoints['booking'] + `${bookingInfo[0].id}/`
                 let res = await API.patch(_path, body)
@@ -173,6 +180,7 @@ export default function NewsTourDetail() {
             }
             const _path = endpoints['booking'] + `${bookingInfo[0].id}/`
             let res = await API.patch(_path, body)
+            setOpen4(true)
         } catch (err) {
             console.info(err)
         }
@@ -223,13 +231,15 @@ export default function NewsTourDetail() {
     const handleClose = (event, reason) => {
         if (reason === 'clickaway') {
             setOpen2(false);
+            setOpen3(false);
+            setOpen4(false);
         }
     };
 
     return (
 
         <Container maxWidth='lg'>
-            <Typography variant="h3">{`${state?.newstour?.title}`}</Typography>
+            <Typography className={classes.title} variant="h3">{`${state?.newstour?.title}`}</Typography>
 
             {loading ? <p>Loading ...</p> :
                 (
@@ -379,10 +389,6 @@ export default function NewsTourDetail() {
             < Dialog open={open} onClose={handleClose_click} aria-labelledby="form-dialog-title">
                 <DialogTitle id="form-dialog-title">Thông tin đơn hàng</DialogTitle>
                 <DialogContent>
-                    <DialogContentText>
-                        To subscribe to this website, please enter your email address here. We will send updates
-                        occasionally.
-                    </DialogContentText>
                     <TextField
                         autoFocus
                         margin="dense"
@@ -429,6 +435,11 @@ export default function NewsTourDetail() {
             <Snackbar open={open3} autoHideDuration={6000} onClose={handleClose}>
                 <Alert onClose={handleClose} severity="success">
                     Bạn đặt tour thành công
+                </Alert>
+            </Snackbar>
+            <Snackbar open={open4} autoHideDuration={6000} onClose={handleClose}>
+                <Alert onClose={handleClose} severity="warning">
+                    Bạn đã hủy tour
                 </Alert>
             </Snackbar>
 

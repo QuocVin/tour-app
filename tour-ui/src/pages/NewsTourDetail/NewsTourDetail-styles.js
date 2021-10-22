@@ -2,6 +2,9 @@ import { makeStyles } from "@material-ui/core/styles";
 
 
 export const useStyles = makeStyles((theme) => ({
+    title: {
+        textAlign: 'center'
+    },
     img: {
         width: '90%',
         height: 450,
@@ -15,7 +18,8 @@ export const useStyles = makeStyles((theme) => ({
         maxHeight: 560,
         borderRadius: 25,
         backgroundColor: '#cce6be',
-        textAlign: '-webkit-center'
+        textAlign: '-webkit-center',
+        marginTop: 50,
     },
     tourTitle: {
         padding: '10px 31px 31px 30px',

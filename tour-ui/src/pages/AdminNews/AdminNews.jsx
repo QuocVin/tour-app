@@ -106,6 +106,7 @@ export default function AdminNews() {
             history.push(_pathPage, {
                 newsId: res.data.id,
                 tourId: res.data.tour,
+                employeeId: res.data.employee,
             })
         })
     }

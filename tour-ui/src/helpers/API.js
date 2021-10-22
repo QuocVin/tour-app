@@ -5,6 +5,7 @@ export let endpoints = {
     'current-user':         '/user/current-user/',
     'oauth2-info':          '/oauth2-info/',
     'login':                '/o/token/',
+    'is-booking':           'is-booking/',
 
     'customer':             'customer/',
     'employee':             'employee/',
@@ -18,12 +19,13 @@ export let endpoints = {
     'search-title':         'search-title/',
     'tour-detail':          '/tour/:id/',
     'have-tour':            'have-tour/',
+    'news-have':            'news-have/',
     
     'booking':              '/booking/',
     'check-booking':        'check-booking/',
     'booking-current-user': 'current-user/',
-
-
+    'month-booking':        'month-booking/',
+    'year-booking':         'year-booking/',
 }
 
 export default axios.create({

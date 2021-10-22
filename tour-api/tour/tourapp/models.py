@@ -176,6 +176,7 @@ class Booking(models.Model):
     # số lượng trẻ em
     people2 = models.IntegerField(default=0)
     totalPrice = models.IntegerField(default=0)
+    dateBooking = models.DateField(auto_now_add=True)
 
     # khóa ngoại
     employee = models.ForeignKey(
