@@ -24,19 +24,35 @@ const rolePaths = {
 
 export default function ({ classes, open }) {
     const check = getAuthLS(LS_KEY.AUTH_TOKEN)
+    // const check = 'QUAN LY';
+    const loggedIn = getAuthLS(LS_KEY.AUTH_TOKEN) ? true : false;
+
     const history = useHistory();
-    // if (check === rolePaths.EMPLOYEE) {
-    //     const [childDrawer, setChildDrawer] = React.useState(
-    //         Object.values(EmpRoutesDrawer)
-    //     ); 
-    // }
-    // if (check === rolePaths.ADMIN) {
-    //     const [childDrawer, setChildDrawer] = React.useState(
-    //         Object.values(ProtectRoutesDrawer)
-    //     );
-    // }
+
+    // xử lý hiện các mục tại thanh drawer
+    const setRoute = (loggedIn, check) => {
+        if (loggedIn) {
+            if (check === rolePaths.EMPLOYEE) {
+                return (
+                    Object.values(EmpRoutesDrawer)
+                );
+            }
+            if (check === rolePaths.ADMIN) {
+                return (
+                    Object.values(ProtectRoutesDrawer)
+                );
+            }
+        }
+        else {
+            return (
+                Object.values([])
+            );
+        }
+    }
+
     const [childDrawer, setChildDrawer] = React.useState(
-        Object.values(ProtectRoutesDrawer)
+        // Object.values(ProtectRoutesDrawer)
+        setRoute(loggedIn, check)
     );
 
     const store = useStore();
@@ -47,14 +63,19 @@ export default function ({ classes, open }) {
     };
 
     // chọn avatar chuyển trang
-    const handleGoProfile = (userId) => {
-        const _pathAPI = endpoints['user'] + endpoints['employee'] + `?id=${userId}`;
-        API.get(_pathAPI).then(res => {
-            const _pathPage = ProtectRoutes.EmployeeDetail.path.replace(":id", userId)
-            history.push(_pathPage, {
-                userId: res.data[0].id,
+    const handleGoProfile = (check, userId) => {
+        if (check === rolePaths.ADMIN) {
+            console.info('pass')
+        }
+        else {
+            const _pathAPI = endpoints['user'] + endpoints['employee'] + `?id=${userId}`;
+            API.get(_pathAPI).then(res => {
+                const _pathPage = ProtectRoutes.EmployeeDetail.path.replace(":id", userId)
+                history.push(_pathPage, {
+                    userId: res.data[0].id,
+                })
             })
-        })
+        }
     }
 
     // chọn mục trên drawer
@@ -81,11 +102,18 @@ export default function ({ classes, open }) {
         >
             <Toolbar />
             <div className={classes.drawerContainer}>
-                {/* <Avatar alt={user.username} className={classes.avatar} onClick={() => handleGoProfile(user.id)}
-                    src={user.avatar.includes('http://127.0.0.1:8000') ? user.avatar : `http://127.0.0.1:8000${user.avatar}`} />
-                <div className={classes.role} >
-                    <Typography variant="body">{user.role}</Typography>
-                </div> */}
+                {loggedIn ? (
+                    <div>
+                        <Avatar alt={user.username} className={classes.avatar} onClick={() => handleGoProfile(check, user.id)}
+                            src={user.avatar.includes('http://127.0.0.1:8000') ? user.avatar : `http://127.0.0.1:8000${user.avatar}`} />
+                        <div className={classes.role} >
+                            <Typography variant="body">{user.role}</Typography>
+                        </div>
+                    </div>
+                ) : (
+                    <div></div>
+                )}
+
                 <List>
                     {childDrawer.map((route, idx) => {
                         const icon = route.bigIcon ? (
