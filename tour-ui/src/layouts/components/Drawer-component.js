@@ -9,7 +9,7 @@ import {
     Avatar,
     Typography,
 } from "@material-ui/core";
-import React from "react";
+import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import { ProtectRoutes, ProtectRoutesDrawer, EmpRoutesDrawer } from "../../routes/protect-route"
 import { useStore } from "react-redux";
@@ -20,12 +20,14 @@ import { getAuthLS, LS_KEY } from '../../helpers/localStorage';
 const rolePaths = {
     EMPLOYEE: 'NHAN VIEN',
     ADMIN: 'QUAN LY',
+    GUEST: 'NGUOI DUNG',
 }
 
 export default function ({ classes, open }) {
     const check = getAuthLS(LS_KEY.AUTH_TOKEN)
     // const check = 'QUAN LY';
     const loggedIn = getAuthLS(LS_KEY.AUTH_TOKEN) ? true : false;
+    let checkAuth = false;
 
     const history = useHistory();
 
@@ -33,17 +35,26 @@ export default function ({ classes, open }) {
     const setRoute = (loggedIn, check) => {
         if (loggedIn) {
             if (check === rolePaths.EMPLOYEE) {
+                checkAuth = true;
                 return (
                     Object.values(EmpRoutesDrawer)
                 );
             }
             if (check === rolePaths.ADMIN) {
+                checkAuth = true;
                 return (
                     Object.values(ProtectRoutesDrawer)
                 );
             }
+            if (check === rolePaths.GUEST) {
+                checkAuth = false;
+                return (
+                    Object.values([])
+                );
+            }
         }
         else {
+            checkAuth = false;
             return (
                 Object.values([])
             );
@@ -102,7 +113,7 @@ export default function ({ classes, open }) {
         >
             <Toolbar />
             <div className={classes.drawerContainer}>
-                {loggedIn ? (
+                {checkAuth ? (
                     <div>
                         <Avatar alt={user.username} className={classes.avatar} onClick={() => handleGoProfile(check, user.id)}
                             src={user.avatar.includes('http://127.0.0.1:8000') ? user.avatar : `http://127.0.0.1:8000${user.avatar}`} />

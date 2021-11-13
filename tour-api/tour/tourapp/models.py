@@ -77,7 +77,7 @@ class Tour(models.Model):
         (OPEN, 'Tour còn mở đăng ký'),
     ]
 
-    dateStart = models.DateField(auto_now_add=True)
+    dateStart = models.DateField()
     dateEnd = models.DateField()
     descriptions = RichTextField()
     title = models.CharField(max_length=80)

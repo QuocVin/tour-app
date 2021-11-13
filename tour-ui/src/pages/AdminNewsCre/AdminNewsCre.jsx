@@ -15,11 +15,13 @@ import {
     MenuItem,
     InputLabel,
     FormControl,
+    Snackbar,
 } from '@material-ui/core';
 import {
     MuiPickersUtilsProvider,
     KeyboardDatePicker,
 } from '@material-ui/pickers';
+import MuiAlert from '@material-ui/lab/Alert';
 import DateFnsUtils from '@date-io/date-fns';
 import { useStyles } from './AdminNewsCre-styles';
 import API, { endpoints } from '../../helpers/API';
@@ -28,6 +30,10 @@ import { useHistory } from 'react-router';
 import { useStore } from "react-redux";
 import cookies from 'react-cookies';
 import { ProtectRoutes } from '../../routes/protect-route';
+
+function Alert(props) {
+    return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 export default function CreateNews() {
     const classes = useStyles();
@@ -39,6 +45,9 @@ export default function CreateNews() {
     const [checkedTour, setCheckedTour] = useState(false);
     const [tours, setTours] = useState([]);
     const [loading, setLoading] = useState(false)
+
+    const [openError, setOpenError] = useState(false);
+    const [textError, setTextError] = useState('');
 
     // lấy thông tin nhân viên
     const store = useStore();
@@ -90,21 +99,35 @@ export default function CreateNews() {
         }
         formData.append("dateEnd", dateEnd.toLocaleDateString('ko-KR').replace(". ", "-").replace(". ", "-").replace(".", ""));
 
-        for (var key of formData.keys()) {
-            console.log(key, formData.get(key));
-        }
-
-        try {
-            let res = await API.post(endpoints["news-tour"], formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
-            });
-            console.info("res:", res)
-            if (res)
-                setOpen(true);
-        } catch (err) {
-            console.log("ERROR:\n", err);
+        // for (var key of formData.keys()) {
+        //     console.log(key, formData.get(key));
+        // }
+        const dateStartTour = new Date(tourChoosed.dateStart)
+        if (dateEnd.getTime() < current.getTime()) {
+            setOpenError(true);
+            setTextError('Lỗi! Ngày kết thúc đến trước ngày đăng bài');
+        } else if (dateEnd.getTime() >= dateStartTour.getTime()) {
+            setOpenError(true);
+            setTextError('Lỗi! Ngày kết thúc đến sau ngày tour khởi hành');
+        } else if (user.role == "QUAN LY") {
+            setOpenError(true);
+            setTextError('Lỗi! Vui lòng sử dụng tài khoản nhân viên để đăng bài viết');
+        } else if (formData.get('image') == null) {
+            setOpenError(true);
+            setTextError('Lỗi! Bạn phải chọn ảnh cho bài viết');
+        } else {
+            try {
+                let res = await API.post(endpoints["news-tour"], formData, {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                });
+                console.info("res:", res)
+                if (res)
+                    setOpen(true);
+            } catch (err) {
+                console.log("ERROR:\n", err);
+            }
         }
     };
 
@@ -141,6 +164,13 @@ export default function CreateNews() {
     const handleBack = () => {
         const _path = ProtectRoutes.NewsTour.path;
         history.push(_path);
+    };
+
+    // đóng thông báo sau khi xem lỗi error1
+    const handleCloseError = (event, reason) => {
+        if (reason === 'clickaway') {
+            setOpenError(false);
+        }
     };
 
     return (
@@ -378,7 +408,7 @@ export default function CreateNews() {
                                     color="primary"
                                     className={classes.submit}
                                 >
-                                    Tạo tour
+                                    Tạo bài viêt
                                 </Button>
                             </Grid>
                         </Grid>
@@ -408,6 +438,13 @@ export default function CreateNews() {
                     </Button>
                 </DialogActions>
             </Dialog>
+
+            {/* xử lý thông báo khi tạo newstour không thành công */}
+            <Snackbar open={openError} autoHideDuration={6000} onClose={handleCloseError}>
+                <Alert onClose={handleCloseError} severity="warning">
+                    {textError}
+                </Alert>
+            </Snackbar>
         </div>
     );
 }

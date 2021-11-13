@@ -81,7 +81,7 @@ export default function Register() {
                                             <TextField
                                                 autoComplete="username"
                                                 variant="outlined"
-                                                // required
+                                                required
                                                 fullWidth
                                                 name="username"
                                                 label="username"
@@ -95,7 +95,7 @@ export default function Register() {
                                             <TextField
                                                 id="password"
                                                 variant="outlined"
-                                                // required
+                                                required
                                                 fullWidth
                                                 name="password"
                                                 label="Password"

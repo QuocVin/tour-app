@@ -61,6 +61,7 @@ export default function NewsTourDetail() {
     const dateBooking = useState(new Date(date));
 
     const [check, setCheck] = useState(false);
+    const tourId = state?.newstour?.tour ? state?.newstour?.tour : state?.newstour?.tour_id;
 
     useEffect(() => {
         async function init() {
@@ -91,7 +92,7 @@ export default function NewsTourDetail() {
     // kiểm tra khách hàng đã đặt tour chưa - chỉnh sửa số lượng ?
     const fetchCheckBooking = async () => {
         setTimeout(() => {
-            const _path = endpoints['booking'] + endpoints['check-booking'] + `?tour=${state?.newstour?.tour}&customer=${user.id}`;
+            const _path = endpoints['booking'] + endpoints['check-booking'] + `?tour=${tourId}&customer=${user.id}`;
             API.get(_path).then(res => {
                 if (res.data.length === 0)
                     setCheck(false)
@@ -208,7 +209,7 @@ export default function NewsTourDetail() {
     const handlOpen_click = () => {
         if (cookies.load("user") != null) {
             setOpen(true);
-            // console.info(bookingInfo[0].id)
+            // console.info(bookingInfo[0].id)X
         } else {
             history.push('/login')
         }
@@ -233,6 +234,7 @@ export default function NewsTourDetail() {
             setOpen2(false);
             setOpen3(false);
             setOpen4(false);
+            window.location.reload();
         }
     };
 

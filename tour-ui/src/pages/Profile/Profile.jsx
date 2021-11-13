@@ -133,6 +133,7 @@ export default function NewsTourDetail() {
             history.push(_pathPage, {
                 newstour: res.data[0],
             })
+            // console.info('res', res.data[0]);
         })
     }
 

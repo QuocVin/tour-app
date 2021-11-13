@@ -15,17 +15,23 @@ import {
     MenuItem,
     InputLabel,
     FormControl,
+    Snackbar,
 } from '@material-ui/core';
 import {
     MuiPickersUtilsProvider,
     KeyboardDatePicker,
 } from '@material-ui/pickers';
+import MuiAlert from '@material-ui/lab/Alert';
 import DateFnsUtils from '@date-io/date-fns';
 import { useStyles } from './AdminTourNew-styles';
 import API, { endpoints } from '../../helpers/API';
 import useSubmitForm from '../../helpers/CustomHooks'
 import { useHistory } from 'react-router';
 import { ProtectRoutes } from '../../routes/protect-route';
+
+function Alert(props) {
+    return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 export default function CreateTour(props) {
     const classes = useStyles();
@@ -34,6 +40,9 @@ export default function CreateTour(props) {
     const [open1, setOpen1] = useState(false);
     const [open2, setOpen2] = useState(false);
     const [open3, setOpen3] = useState(false);
+    const [openError, setOpenError] = useState(false);
+    const [textError, setTextError] = useState('');
+
     const [address, setAddress] = useState([]);
     const [type, setType] = useState([]);
     const [loading, setLoading] = useState(false)
@@ -102,23 +111,37 @@ export default function CreateTour(props) {
         formData.append("price1", inputs["price1"]);
         formData.append("price2", inputs["price2"]);
 
-        formData.append("dateStart", dateEnd.toLocaleDateString('ko-KR').replace(". ", "-").replace(". ", "-").replace(".", ""));
+        formData.append("dateStart", dateStart.toLocaleDateString('ko-KR').replace(". ", "-").replace(". ", "-").replace(".", ""));
         formData.append("dateEnd", dateEnd.toLocaleDateString('ko-KR').replace(". ", "-").replace(". ", "-").replace(".", ""));
 
-        for (var key of formData.keys()) {
-            console.log(key, formData.get(key));
-        }
+        // for (var key of formData.keys()) {
+        //     console.log(key, formData.get(key));
+        // }
 
-        try {
-            let res = await API.post(endpoints["tour"], formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
-            });
-            if (res)
-                setOpen(true);
-        } catch (err) {
-            console.log("ERROR:\n", err);
+        if (formData.get('type') == "" || inputs["address1"] == null || inputs["address2"] == null) {
+            setOpenError(true);
+            setTextError('Lỗi! Bạn phải chọn cả 2 địa chỉ và hình thức');
+        } else if (formData.get('price1') < 0 || formData.get('price2') < 0) {
+            setOpenError(true);
+            setTextError('Giá tour phải là số dương');
+        } else if (dateStart.getTime() < current.getTime()) {
+            setOpenError(true);
+            setTextError('Lỗi! Ngày được chọn là ngày đã ở quá khứ');
+        } else if (dateEnd.getTime() < dateStart.getTime()) {
+            setOpenError(true);
+            setTextError('Lỗi! Ngày kết thúc đến trước ngày khởi hành');
+        } else {
+            try {
+                let res = await API.post(endpoints["tour"], formData, {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                });
+                if (res)
+                    setOpen(true);
+            } catch (err) {
+                console.log("ERROR:\n", err);
+            }
         }
     };
 
@@ -161,6 +184,13 @@ export default function CreateTour(props) {
     const handleBack = () => {
         const _path = ProtectRoutes.Tour.path;
         history.push(_path);
+    };
+
+    // đóng thông báo sau khi xem lỗi error1
+    const handleCloseError = (event, reason) => {
+        if (reason === 'clickaway') {
+            setOpenError(false);
+        }
     };
 
     return (
@@ -398,6 +428,13 @@ export default function CreateTour(props) {
                     </Button>
                 </DialogActions>
             </Dialog>
+
+            {/* xử lý thông báo khi tạo tour không thành công */}
+            <Snackbar open={openError} autoHideDuration={6000} onClose={handleCloseError}>
+                <Alert onClose={handleCloseError} severity="warning">
+                    {textError}
+                </Alert>
+            </Snackbar>
         </div>
     );
 }

@@ -73,7 +73,7 @@ function createData(stt, title, dateStart, dateEnd, price1, price2, pointStart, 
 export default function AdminTour() {
     const classes = useStyles();
     const history = useHistory();
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(false);
     const [title, setTitle] = useState('');
 
     const [tour, setTour] = useState([])
