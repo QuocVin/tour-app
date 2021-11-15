@@ -109,9 +109,9 @@ export default function CreateNews() {
         } else if (dateEnd.getTime() >= dateStartTour.getTime()) {
             setOpenError(true);
             setTextError('Lỗi! Ngày kết thúc đến sau ngày tour khởi hành');
-        } else if (user.role == "QUAN LY") {
-            setOpenError(true);
-            setTextError('Lỗi! Vui lòng sử dụng tài khoản nhân viên để đăng bài viết');
+        // } else if (user.role == "QUAN LY") {
+            // setOpenError(true);
+            // setTextError('Lỗi! Vui lòng sử dụng tài khoản nhân viên để đăng bài viết');
         } else if (formData.get('image') == null) {
             setOpenError(true);
             setTextError('Lỗi! Bạn phải chọn ảnh cho bài viết');

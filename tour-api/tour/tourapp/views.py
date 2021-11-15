@@ -162,14 +162,13 @@ class NewsTourViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.ListAPI
         return Response({"invalid request": "not found"},
                         status.HTTP_400_BAD_REQUEST)
 
-    # tìm kiếm bài viết qua title
+    # tìm kiếm bài viết qua title - view admin
     @action(methods=['get'], detail=False, url_path='search-title')
     def search_title(self, request):
         # tìm kiếm các bài viết mà nhân viên đã viết - view quản trị
         if request.query_params.__contains__('title') and request.query_params.__contains__('employee'):
             query = NewsTour.objects.filter(
                 title__icontains=request.query_params.__getitem__('title'),
-                static='DANG MO',
                 employee=request.query_params.__getitem__('employee'),
             )
             return Response(list(query.values()))
@@ -178,9 +177,20 @@ class NewsTourViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.ListAPI
             if request.query_params.__contains__('title'):
                 query = NewsTour.objects.filter(
                     title__icontains=request.query_params.__getitem__('title'),
-                    static='DANG MO',
                 )
                 return Response(list(query.values()))
+        return Response({"invalid request": "not found"},
+                        status.HTTP_400_BAD_REQUEST)
+
+    # tìm kiếm bài viết qua title - view guest
+    @action(methods=['get'], detail=False, url_path='search-title-guest')
+    def search_title_guest(self, request):
+        if request.query_params.__contains__('title'):
+            query = NewsTour.objects.filter(
+                title__icontains=request.query_params.__getitem__('title'),
+                static='DANG MO',
+            )
+            return Response(list(query.values()))
         return Response({"invalid request": "not found"},
                         status.HTTP_400_BAD_REQUEST)
 
@@ -202,6 +212,19 @@ class TourViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.ListAPIView
                 tour.address.add(a)
 
         return Response(status=status.HTTP_200_OK)
+
+    # tìm kiếm tour qua title
+    @action(methods=['get'], detail=False, url_path='search-title')
+    def search_title(self, request):
+        # tìm kiếm các bài viết qua title
+        if request.query_params.__contains__('title'):
+            query = Tour.objects.filter(
+                title__icontains=request.query_params.__getitem__('title'),
+                # static='DANG MO',
+            )
+            return Response(list(query.values()))
+        return Response({"invalid request": "not found"},
+                        status.HTTP_400_BAD_REQUEST)
 
 
 class AddressViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.ListAPIView, generics.RetrieveAPIView):

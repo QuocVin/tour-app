@@ -40,13 +40,14 @@ export default function NewsTourDetail() {
     const [type, setType] = useState();
     const [tour, setTour] = useState([]);
     const [bookingInfo, setBookingInfo] = useState([]);
+    const [checkStatic, setCheckStatic] = useState(false);
 
     const [people1, setPeople1] = useState(0);
     const [people2, setPeople2] = useState(0);
     const [address1, setAddress1] = useState();
     const [address2, setAddress2] = useState();
 
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(false);
 
     const store = useStore();
     const auth = store.getState();
@@ -67,6 +68,7 @@ export default function NewsTourDetail() {
         async function init() {
             setLoading(true)
             await fetchTour()
+            state?.newstour?.static === "DANG MO" ? setCheckStatic(true) : setCheckStatic(false)
             if (user != null) {
                 if (user.username != null)
                     await fetchCheckBooking()
@@ -376,11 +378,22 @@ export default function NewsTourDetail() {
                             </Grid>
 
                             <Grid container xs={12} className={classes.booking}>
-                                <Button
-                                    fullWidth
-                                    variant="contained"
-                                    className={classes.btnBooking}
-                                    onClick={() => handlOpen_click()}>Đặt tour</Button>
+                                {checkStatic ?
+                                    (<Button
+                                        fullWidth
+                                        variant="contained"
+                                        className={classes.btnBooking}
+                                        onClick={() => handlOpen_click()}>Đặt tour</Button>
+                                    ) :
+                                    (
+                                        <Button
+                                            fullWidth
+                                            variant="contained"
+                                            className={classes.btnBooking}
+                                            disabled
+                                            >Đã đóng</Button>
+                                    )
+                                }
                             </Grid>
                         </Grid>
                     </Grid>

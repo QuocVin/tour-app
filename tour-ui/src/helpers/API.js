@@ -14,9 +14,11 @@ export let endpoints = {
     'address':              '/address/',
     'type':                 '/type/',
     'tour':                 '/tour/',
+    'tour-search':          'search-title/',
 
     'news-tour':            '/news-tour/',
     'search-title':         'search-title/',
+    'search-title-guest':   'search-title-guest/',
     'tour-detail':          '/tour/:id/',
     'have-tour':            'have-tour/',
     'news-have':            'news-have/',

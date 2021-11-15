@@ -90,6 +90,9 @@ export default function NewsDetail() {
 
     const [open, setOpen] = useState(false);
     const [open2, setOpen2] = useState(false);
+    const [open3, setOpen3] = useState(false);
+    const [checkStatic, setCheckStatic] = useState(false);
+
     const [openInfo, setOpenInfo] = useState(false);
     const [loading, setLoading] = useState(false)
 
@@ -121,6 +124,7 @@ export default function NewsDetail() {
                 setNews(res.data);
                 setDateEnd(res.data.dateEnd)
                 setDescriptions(res.data.descriptions)
+                res.data.static === "DANG MO" ? setCheckStatic(true) : setCheckStatic(false);
             })
         }, 500);
     }
@@ -231,6 +235,25 @@ export default function NewsDetail() {
         }
     }
 
+    // mở bài viết
+    const openNews = async () => {
+        const formData = new FormData();
+        formData.append("static", "DANG MO");
+        try {
+            const _path = endpoints["news-tour"] + `${state?.newsId}/`
+            let res = await API.patch(_path, formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+            console.info("res:", res)
+            if (res)
+                setOpen3(true);
+        } catch (err) {
+            console.log("ERROR:\n", err);
+        }
+    }
+
     const { inputs, handleInputChange, handleSubmit } = useSubmitForm(changeInfo);
 
     // chọn nút quay lại
@@ -244,10 +267,16 @@ export default function NewsDetail() {
         closeNews();
     };
 
+    // chọn nút mở bài viết
+    const handleOpenNews = () => {
+        openNews();
+    };
+
     // xử lý sau khi hiện thông báo
     const handleCloseAlert = () => {
         setOpen(false);
         setOpen2(false);
+        setOpen3(false);
         window.location.reload();
     };
 
@@ -499,15 +528,30 @@ export default function NewsDetail() {
                                 </Button>
                             </Grid>
                             <Grid item xs={3}>
-                                <Button
-                                    fullWidth
-                                    variant="contained"
-                                    color="primary"
-                                    className={classes.submit}
-                                    onClick={handleCloseNews}
-                                >
-                                    Đóng bài viết
-                                </Button>
+                                {checkStatic ?
+                                    (
+                                        <Button
+                                            fullWidth
+                                            variant="contained"
+                                            color="primary"
+                                            className={classes.submit}
+                                            onClick={handleCloseNews}
+                                        >
+                                            Đóng bài viết
+                                        </Button>
+                                    ) :
+                                    (
+                                        <Button
+                                            fullWidth
+                                            variant="contained"
+                                            color="primary"
+                                            className={classes.submit}
+                                            onClick={handleOpenNews}
+                                        >
+                                            Mở bài viết
+                                        </Button>
+                                    )
+                                }
                             </Grid>
                             <Grid item xs={6}>
                                 <Button
@@ -594,6 +638,11 @@ export default function NewsDetail() {
             <Snackbar open={open2} autoHideDuration={6000} onClose={handleCloseAlert}>
                 <Alert onClose={handleCloseAlert} severity="warning">
                     Bạn đã đóng bài viết
+                </Alert>
+            </Snackbar>
+            <Snackbar open={open3} autoHideDuration={6000} onClose={handleCloseAlert}>
+                <Alert onClose={handleCloseAlert} severity="success">
+                    Bạn đã mở bài viết
                 </Alert>
             </Snackbar>
         </div>

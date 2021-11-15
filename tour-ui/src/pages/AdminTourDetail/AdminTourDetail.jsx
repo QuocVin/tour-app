@@ -31,7 +31,10 @@ export default function CreateTour(props) {
 
     const [open, setOpen] = useState(false);
     const [open2, setOpen2] = useState(false);
+    const [open3, setOpen3] = useState(false);
+
     const [loading, setLoading] = useState(false)
+    const [checkStatus, setCheckStatus] = useState(false)
 
     const [tour, setTour] = useState([]);
     const [typeTour, setTypeTour] = useState();
@@ -68,6 +71,7 @@ export default function CreateTour(props) {
                 setDateStart(res.data.dateStart)
                 setDateEnd(res.data.dateEnd)
                 setDescriptions(res.data.descriptions)
+                res.data.static === "DANG MO" ? setCheckStatus(true) : setCheckStatus(false)
             })
             setLoading(false)
         }, 500);
@@ -119,6 +123,24 @@ export default function CreateTour(props) {
         }
     }
 
+    // mở bài viết
+    const openTour = async () => {
+        const formData = new FormData();
+        formData.append("static", "DANG MO");
+        try {
+            const _path = endpoints["tour"] + `${state?.tourId}/`
+            let res = await API.patch(_path, formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+            if (res)
+                setOpen3(true);
+        } catch (err) {
+            console.log("ERROR:\n", err);
+        }
+    }
+
     const { inputs, handleInputChange, handleSubmit } = useSubmitForm(changeInfo);
 
     // chọn nút quay về
@@ -132,10 +154,18 @@ export default function CreateTour(props) {
         closeTour();
     };
 
+    // chọn nút mở tour
+    const handleOpenTour = () => {
+        openTour();
+    };
+
+
+
     // xử lý sau khi hiện thông báo
     const handleCloseAlert = () => {
         setOpen(false);
         setOpen2(false);
+        setOpen3(false);
         window.location.reload();
     };
 
@@ -302,15 +332,31 @@ export default function CreateTour(props) {
                                 </Button>
                             </Grid>
                             <Grid item xs={3}>
-                                <Button
-                                    fullWidth
-                                    variant="contained"
-                                    color="primary"
-                                    className={classes.submit}
-                                    onClick={handleCloseTour}
-                                >
-                                    Đóng tour
-                                </Button>
+                                {checkStatus ?
+                                    (
+                                        <Button
+                                            fullWidth
+                                            variant="contained"
+                                            color="primary"
+                                            className={classes.submit}
+                                            onClick={handleCloseTour}
+                                        >
+                                            Đóng tour
+                                        </Button>
+                                    ) :
+                                    (
+                                        <Button
+                                            fullWidth
+                                            variant="contained"
+                                            color="primary"
+                                            className={classes.submit}
+                                            onClick={handleOpenTour}
+                                        >
+                                            Mở tour
+                                        </Button>
+                                    )
+                                }
+
                             </Grid>
                             <Grid item xs={6}>
                                 <Button
@@ -337,6 +383,11 @@ export default function CreateTour(props) {
             <Snackbar open={open2} autoHideDuration={6000} onClose={handleCloseAlert}>
                 <Alert onClose={handleCloseAlert} severity="warning">
                     Bạn đã đóng tour
+                </Alert>
+            </Snackbar>
+            <Snackbar open={open3} autoHideDuration={6000} onClose={handleCloseAlert}>
+                <Alert onClose={handleCloseAlert} severity="success">
+                    Bạn đã mở tour
                 </Alert>
             </Snackbar>
         </div>

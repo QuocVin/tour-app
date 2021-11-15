@@ -46,18 +46,18 @@ const columns = [
         minWidth: 150,
         align: 'right',
     },
-    {
-        id: 'pointStart',
-        label: 'Điểm xuất phát',
-        minWidth: 150,
-        align: 'left',
-    },
-    {
-        id: 'pointEnd',
-        label: 'Điểm đến',
-        minWidth: 150,
-        align: 'left',
-    },
+    // {
+    //     id: 'pointStart',
+    //     label: 'Điểm xuất phát',
+    //     minWidth: 150,
+    //     align: 'left',
+    // },
+    // {
+    //     id: 'pointEnd',
+    //     label: 'Điểm đến',
+    //     minWidth: 150,
+    //     align: 'left',
+    // },
     {
         id: 'static1',
         label: 'Trạng thái',
@@ -66,8 +66,12 @@ const columns = [
     },
 ];
 
-function createData(stt, title, dateStart, dateEnd, price1, price2, pointStart, pointEnd, static1, userId) {
-    return { stt, title, dateStart, dateEnd, price1, price2, pointStart, pointEnd, static1, userId };
+// function createData(stt, title, dateStart, dateEnd, price1, price2, pointStart, pointEnd, static1, userId) {
+//     return { stt, title, dateStart, dateEnd, price1, price2, pointStart, pointEnd, static1, userId };
+// }
+
+function createData(stt, title, dateStart, dateEnd, price1, price2, static1, userId) {
+    return { stt, title, dateStart, dateEnd, price1, price2, static1, userId };
 }
 
 export default function AdminTour() {
@@ -90,12 +94,15 @@ export default function AdminTour() {
     const fetchTour = async () => {
         setLoading(true)
         setTimeout(() => {
-            const _path = endpoints['tour']
+            // const _path = endpoints['tour']
+            const _path = endpoints['tour'] + endpoints['tour-search'] + `?title=${title}`
             API.get(_path).then(res => {
                 setTour(
                     res.data.map((b, idx) =>
+                        // createData(idx + 1, b.title, b.dateStart, b.dateEnd, b.price1 + ' VNĐ'
+                        //     , b.price2 + ' VNĐ', b.address[0].name, b.address[1].name, b.static, b.id)
                         createData(idx + 1, b.title, b.dateStart, b.dateEnd, b.price1 + ' VNĐ'
-                            , b.price2 + ' VNĐ', b.address[0].name, b.address[1].name, b.static, b.id)
+                            , b.price2 + ' VNĐ', b.static, b.id)
                     )
                 );
                 setLoading(false)
@@ -165,7 +172,7 @@ export default function AdminTour() {
                         <SearchIcon />
                     </Button>
                 </Grid>
-                
+
                 <Grid item xs={5}>
                     <Button
                         fullWidth
