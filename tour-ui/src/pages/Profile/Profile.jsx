@@ -9,6 +9,7 @@ import {
     DialogActions,
     Dialog,
     TextField,
+    Container
 } from '@material-ui/core';
 import useSubmitForm from '../../helpers/CustomHooks'
 import API, { endpoints } from '../../helpers/API';
@@ -145,153 +146,158 @@ export default function NewsTourDetail() {
     };
 
     return (
-        <Grid container spacing={8} xs={11}>
-            {/* thông tin người dùng */}
-            <Grid item xs={5}>
-                <Typography variant="h3">Thông tin người dùng</Typography>
-                <form className={classes.form} onSubmit={handleSubmit}>
-                    {/* <form className={classes.form} > */}
-                    <Grid container spacing={2}>
-                        {/* Thông tin người dùng */}
-                        <Grid item xs={12}>
-                            <Typography variant="h5">Thông tin người dùng</Typography>
-                            <Grid container xs={12} spacing={2}>
-                                {/* Tên */}
-                                <Grid item xs={6}>
-                                    <Typography variant="caption">Họ</Typography>
-                                    <TextField
-                                        autoComplete="lname"
-                                        variant="outlined"
-                                        fullWidth
-                                        id="lastName"
-                                        name="last_name"
-                                        label={user.last_name}
-                                        value={inputs.last_name}
-                                        onChange={handleInputChange}
-                                    />
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <Typography variant="caption">Tên</Typography>
-                                    <TextField
-                                        autoComplete="fname"
-                                        variant="outlined"
-                                        fullWidth
-                                        id="firstName"
-                                        autoFocus
-                                        type="text"
-                                        name="first_name"
-                                        label={user.first_name}
-                                        value={inputs.first_name}
-                                        onChange={handleInputChange}
-                                    />
-                                </Grid>
+        // <Container maxWidth="lg">
 
-                                {/* email + số điện thoại */}
-                                <Grid item xs={6} >
-                                    <Typography variant="caption">Email</Typography>
-                                    <TextField
-                                        autoComplete="email"
-                                        variant="outlined"
-                                        fullWidth
-                                        id="email"
-                                        name="email"
-                                        type="email"
-                                        label={user.email}
-                                        value={inputs.email}
-                                        onChange={handleInputChange}
-                                    />
-                                </Grid>
-                                <Grid item xs={6} >
-                                    <Typography variant="caption">Số điện thoại</Typography>
-                                    <TextField
-                                        autoComplete="phone"
-                                        variant="outlined"
-                                        fullWidth
-                                        name="phone"
-                                        type="number"
-                                        id="phone"
-                                        label={user.phone}
-                                        value={inputs.phone}
-                                        onChange={handleInputChange}
-                                    />
-                                </Grid>
+        // </Container>
+        <div className={classes.body}>
+            <Grid container spacing={8} xs={11}>
+                {/* thông tin người dùng */}
+                <Grid item xs={5}>
+                    <Typography variant="h3">Thông tin người dùng</Typography>
+                    <form className={classes.form} onSubmit={handleSubmit}>
+                        {/* <form className={classes.form} > */}
+                        <Grid container spacing={2}>
+                            {/* Thông tin người dùng */}
+                            <Grid item xs={12}>
+                                <Typography variant="h5">Thông tin người dùng</Typography>
+                                <Grid container xs={12} spacing={2}>
+                                    {/* Tên */}
+                                    <Grid item xs={6}>
+                                        <Typography variant="caption">Họ</Typography>
+                                        <TextField
+                                            autoComplete="lname"
+                                            variant="outlined"
+                                            fullWidth
+                                            id="lastName"
+                                            name="last_name"
+                                            label={user.last_name}
+                                            value={inputs.last_name}
+                                            onChange={handleInputChange}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={6}>
+                                        <Typography variant="caption">Tên</Typography>
+                                        <TextField
+                                            autoComplete="fname"
+                                            variant="outlined"
+                                            fullWidth
+                                            id="firstName"
+                                            autoFocus
+                                            type="text"
+                                            name="first_name"
+                                            label={user.first_name}
+                                            value={inputs.first_name}
+                                            onChange={handleInputChange}
+                                        />
+                                    </Grid>
 
-                                {/* Địa chỉ */}
-                                <Grid item xs={12} >
-                                    <Typography variant="caption">Địa chỉ</Typography>
-                                    <TextField
-                                        autoComplete="address"
-                                        variant="outlined"
-                                        fullWidth
-                                        id="address"
-                                        name="address"
-                                        label={user.address}
-                                        value={inputs.address}
-                                        onChange={handleInputChange}
-                                    />
-                                </Grid>
+                                    {/* email + số điện thoại */}
+                                    <Grid item xs={6} >
+                                        <Typography variant="caption">Email</Typography>
+                                        <TextField
+                                            autoComplete="email"
+                                            variant="outlined"
+                                            fullWidth
+                                            id="email"
+                                            name="email"
+                                            type="email"
+                                            label={user.email}
+                                            value={inputs.email}
+                                            onChange={handleInputChange}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={6} >
+                                        <Typography variant="caption">Số điện thoại</Typography>
+                                        <TextField
+                                            autoComplete="phone"
+                                            variant="outlined"
+                                            fullWidth
+                                            name="phone"
+                                            type="number"
+                                            id="phone"
+                                            label={user.phone}
+                                            value={inputs.phone}
+                                            onChange={handleInputChange}
+                                        />
+                                    </Grid>
 
-                                {/* ảnh */}
-                                <Grid item xs={9} >
-                                    <input
-                                        accept="image/*"
-                                        className={classes.input}
-                                        id="contained-button-file"
-                                        multiple
-                                        type="file"
-                                        ref={avatar}
-                                    />
-                                    <label htmlFor="contained-button-file">
-                                        <Button variant="contained" color="primary"
-                                            maxWidth component="span">
-                                            Avatar
-                                        </Button>
-                                    </label>
+                                    {/* Địa chỉ */}
+                                    <Grid item xs={12} >
+                                        <Typography variant="caption">Địa chỉ</Typography>
+                                        <TextField
+                                            autoComplete="address"
+                                            variant="outlined"
+                                            fullWidth
+                                            id="address"
+                                            name="address"
+                                            label={user.address}
+                                            value={inputs.address}
+                                            onChange={handleInputChange}
+                                        />
+                                    </Grid>
+
+                                    {/* ảnh */}
+                                    <Grid item xs={9} >
+                                        <input
+                                            accept="image/*"
+                                            className={classes.input}
+                                            id="contained-button-file"
+                                            multiple
+                                            type="file"
+                                            ref={avatar}
+                                        />
+                                        <label htmlFor="contained-button-file">
+                                            <Button variant="contained" color="primary"
+                                                maxWidth component="span">
+                                                Avatar
+                                            </Button>
+                                        </label>
+                                    </Grid>
                                 </Grid>
                             </Grid>
                         </Grid>
-                    </Grid>
 
-                    <Button
-                        type="submit"
-                        fullWidth
-                        variant="contained"
-                        color="primary"
-                        className={classes.submit}
-                    >
-                        Cập nhập
-                    </Button>
-                </form>
+                        <Button
+                            type="submit"
+                            fullWidth
+                            variant="contained"
+                            color="primary"
+                            className={classes.submit}
+                        >
+                            Cập nhập
+                        </Button>
+                    </form>
 
+                </Grid>
+
+                {/* lịch sử giao dịch */}
+                <Grid item xs={7}>
+                    <Typography variant="h3">Lịch sử giao dịch</Typography>
+                    {loading ? <p>Loading ...</p> :
+                        <AppTable columns={columns} data={booking} handleChooseBooking={handleChooseBooking} />
+                    }
+                </Grid>
+
+                {/* xử lý thông báo khi cập nhập thông tin người dùng */}
+                <Dialog
+                    open={open}
+                    onClose={handleCloseDialog}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description"
+                >
+                    <DialogTitle id="alert-dialog-title">Thông báo</DialogTitle>
+                    <DialogContent>
+                        <DialogContentText id="alert-dialog-description">
+                            Bạn đã thành công cập nhập thông tin
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button color="primary" autoFocus onClick={handleCloseDialog}>
+                            Xác nhận
+                        </Button>
+                    </DialogActions>
+                </Dialog>
             </Grid>
-
-            {/* lịch sử giao dịch */}
-            <Grid item xs={7}>
-                <Typography variant="h3">Lịch sử giao dịch</Typography>
-                {loading ? <p>Loading ...</p> :
-                    <AppTable columns={columns} data={booking} handleChooseBooking={handleChooseBooking} />
-                }
-            </Grid>
-
-            {/* xử lý thông báo khi cập nhập thông tin người dùng */}
-            <Dialog
-                open={open}
-                onClose={handleCloseDialog}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-            >
-                <DialogTitle id="alert-dialog-title">Thông báo</DialogTitle>
-                <DialogContent>
-                    <DialogContentText id="alert-dialog-description">
-                        Bạn đã thành công cập nhập thông tin
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button color="primary" autoFocus onClick={handleCloseDialog}>
-                        Xác nhận
-                    </Button>
-                </DialogActions>
-            </Dialog>
-        </Grid>
+        </div>
     )
 }

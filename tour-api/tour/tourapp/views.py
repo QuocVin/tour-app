@@ -156,7 +156,7 @@ class NewsTourViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.ListAPI
             query = NewsTour.objects.filter(
                 tour=request.query_params.__getitem__('tour'),
                 employee=request.query_params.__getitem__('employee'),
-                static='DANG MO',
+                # static='DANG MO',
             )
             return Response(list(query.values()))
         return Response({"invalid request": "not found"},

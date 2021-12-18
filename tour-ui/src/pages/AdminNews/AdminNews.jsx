@@ -12,7 +12,7 @@ import { useHistory } from 'react-router';
 import AppTable from '../../components/Table';
 import SearchIcon from '@material-ui/icons/Search';
 import { ProtectRoutes } from '../../routes/protect-route';
-
+import moment from "moment";
 
 const columns = [
     { id: 'stt', label: 'STT', maxWidth: 20, align: 'center', },
@@ -25,13 +25,13 @@ const columns = [
     {
         id: 'dateCreate',
         label: 'Ngày đăng',
-        minWidth: 100,
+        minWidth: 120,
         align: 'left',
     },
     {
         id: 'dateEnd',
         label: 'Hạn',
-        minWidth: 100,
+        minWidth: 120,
         align: 'left',
     },
     {
@@ -75,7 +75,10 @@ export default function AdminNews() {
             API.get(_path).then(res => {
                 setNews(
                     res.data.map((b, idx) =>
-                        createData(idx + 1, b.title, b.dateCreate, b.dateEnd, b.descriptions, b.static, b.id)
+                        createData(idx + 1, `${b.title.substr(0.20)}. . .`,
+                            moment(b.dateCreate).format("DD-MM-YYYY").toString(),
+                            moment(b.dateEnd).format("DD-MM-YYYY").toString(),
+                            `${b.descriptions.substr(0, 60)}. . .`, b.static, b.id)
                     )
                 );
                 setLoading(false)

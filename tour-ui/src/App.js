@@ -8,42 +8,19 @@ import {
 import Layout from "./layouts";
 import { PublicRoutes, RoutePaths } from "./routes/public-route";
 import { ProtectRoutes, AdminPaths, EmployeeRoutes } from "./routes/protect-route";
-import { getAuthLS, LS_KEY } from '../src/helpers/localStorage';
+import { getAuthLS, LS_KEY, clearAuthLS } from '../src/helpers/localStorage';
+import cookies from 'react-cookies';
 
 function App() {
   // const loggedIn = true;
-  const loggedIn = getAuthLS(LS_KEY.AUTH_TOKEN) ? true : false;
+  let loggedIn = getAuthLS(LS_KEY.AUTH_TOKEN) ? true : false;
   const check = getAuthLS(LS_KEY.AUTH_TOKEN)
-
-  function BasicLayout(props) {
-    return (
-      <Layout {...props}>
-        <Switch>
-          {Object.values(PublicRoutes).map((route, idx) => {
-            return (
-              <Route
-                key={idx}
-                path={route.path}
-                exact={route.exact}
-                render={(props) => <route.component {...props} />}
-              />
-            );
-          })}
-          {Object.values(ProtectRoutes).map((route, idx) => {
-            return (
-              <Route
-                key={idx}
-                path={route.path}
-                exact={route.exact}
-                render={(props) => <route.component {...props} />}
-              />
-            );
-          })}
-          <Redirect to={RoutePaths.Home} />
-        </Switch>
-      </Layout>
-    );
-  }
+  if (cookies.load("user") == null || !loggedIn) {
+    loggedIn = false;
+    clearAuthLS();
+    cookies.remove("user");
+    cookies.remove("access_token");
+  };
 
   function GuestLayout(props) {
     return (
@@ -154,20 +131,22 @@ function App() {
     ADMIN: 'QUAN LY',
   }
 
-  function ManageRoute({ role }) {
+  function ManageRoute({ role = rolePaths.GUEST }) {
     if (role === rolePaths.CUSTOMER) {
       return (
         <Route key={1} path="/" render={(props) => <CustomerLayout {...props} />} />
       );
-    }
-    if (role === rolePaths.EMPLOYEE) {
+    } else if (role === rolePaths.EMPLOYEE) {
       return (
         <Route key={2} path="/" render={(props) => <EmployeeLayout {...props} />} />
       );
-    }
-    if (role === rolePaths.ADMIN) {
+    } else if (role === rolePaths.ADMIN) {
       return (
         <Route key={3} path="/" render={(props) => <AdminLayout {...props} />} />
+      );
+    } else {
+      return (
+        <Route key={1} path="/" render={(props) => <GuestLayout {...props} />} />
       );
     }
   }

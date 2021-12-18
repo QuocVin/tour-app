@@ -251,7 +251,11 @@ export default function NewsTourDetail() {
                         {/* thông tin về bài viết */}
                         <Grid item xs={8}>
                             <Grid container>
-                                <img className={classes.img} src={`${state?.newstour?.image}`} alt={`${state?.newstour?.title}`} />
+                                {/* <img className={classes.img} src={`${state?.newstour?.image}`} alt={`${state?.newstour?.title}`} /> */}
+                                <img className={classes.img} 
+                                alt={`${state?.newstour?.title}`} 
+                                src={state?.newstour?.image.includes('http://127.0.0.1:8000') ? state?.newstour?.image : `http://127.0.0.1:8000/${state?.newstour?.image}`}
+                                />
                             </Grid>
                             <Typography variant="body">Đăng ngày {`${state?.newstour?.dateCreate}`}</Typography>
                             <TextField

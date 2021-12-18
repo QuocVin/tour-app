@@ -12,26 +12,26 @@ import { useHistory } from 'react-router';
 import AppTable from '../../components/Table';
 import SearchIcon from '@material-ui/icons/Search';
 import { ProtectRoutes } from '../../routes/protect-route';
-
+import moment from "moment";
 
 const columns = [
     { id: 'stt', label: 'STT', maxWidth: 20, align: 'center', },
     {
         id: 'title',
         label: 'Tiêu đề',
-        minWidth: 100,
+        minWidth: 120,
         align: 'left',
     },
     {
         id: 'dateStart',
         label: 'Ngày đăng',
-        minWidth: 100,
+        minWidth: 120,
         align: 'left',
     },
     {
         id: 'dateEnd',
         label: 'Hạn',
-        minWidth: 100,
+        minWidth: 120,
         align: 'left',
     },
     {
@@ -46,18 +46,6 @@ const columns = [
         minWidth: 150,
         align: 'right',
     },
-    // {
-    //     id: 'pointStart',
-    //     label: 'Điểm xuất phát',
-    //     minWidth: 150,
-    //     align: 'left',
-    // },
-    // {
-    //     id: 'pointEnd',
-    //     label: 'Điểm đến',
-    //     minWidth: 150,
-    //     align: 'left',
-    // },
     {
         id: 'static1',
         label: 'Trạng thái',
@@ -65,10 +53,6 @@ const columns = [
         align: 'left',
     },
 ];
-
-// function createData(stt, title, dateStart, dateEnd, price1, price2, pointStart, pointEnd, static1, userId) {
-//     return { stt, title, dateStart, dateEnd, price1, price2, pointStart, pointEnd, static1, userId };
-// }
 
 function createData(stt, title, dateStart, dateEnd, price1, price2, static1, userId) {
     return { stt, title, dateStart, dateEnd, price1, price2, static1, userId };
@@ -84,7 +68,6 @@ export default function AdminTour() {
 
     useEffect(() => {
         async function init() {
-            // setLoading(true)
             await fetchTour()
         }
         init()
@@ -94,15 +77,14 @@ export default function AdminTour() {
     const fetchTour = async () => {
         setLoading(true)
         setTimeout(() => {
-            // const _path = endpoints['tour']
             const _path = endpoints['tour'] + endpoints['tour-search'] + `?title=${title}`
             API.get(_path).then(res => {
                 setTour(
                     res.data.map((b, idx) =>
-                        // createData(idx + 1, b.title, b.dateStart, b.dateEnd, b.price1 + ' VNĐ'
-                        //     , b.price2 + ' VNĐ', b.address[0].name, b.address[1].name, b.static, b.id)
-                        createData(idx + 1, b.title, b.dateStart, b.dateEnd, b.price1 + ' VNĐ'
-                            , b.price2 + ' VNĐ', b.static, b.id)
+                        createData(idx + 1,  `${b.title.substr(0.20)}. . .`,
+                            moment(b.dateCreate).format("DD-MM-YYYY").toString(),
+                            moment(b.dateEnd).format("DD-MM-YYYY").toString(),
+                            b.price1 + ' VNĐ', b.price2 + ' VNĐ', b.static, b.id)
                     )
                 );
                 setLoading(false)
@@ -111,7 +93,7 @@ export default function AdminTour() {
     }
 
     // tìm kiếm bằng title
-    const handleChangeTitle = (e) => {
+    const handleChangeTitle = (e) => {  
         setTitle(e.target.value)
     };
     const handleSearch = () => {

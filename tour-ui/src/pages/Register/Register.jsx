@@ -36,7 +36,9 @@ export default function Register() {
             }
         }
 
-        formData.append("avatar", avatar.current.files[0]);
+        if (avatar.current.files.length !== 0) {
+            formData.append("avatar", avatar.current.files[0]);
+        }
         formData.append("role", "NGUOI DUNG");
 
         for (var key of formData.keys()) {
@@ -119,13 +121,6 @@ export default function Register() {
                                                 value={inputs.confirm_password}
                                                 onChange={handleInputChange}
                                                 name="confirm_password"
-                                            />
-                                        </Grid>
-                                        <Grid item xs={12}>
-                                            <FormControlLabel
-                                                control={<Checkbox value="allowExtraEmails" color="primary" />}
-                                                label="Tôi chấp nhận chính sách bảo mật."
-                                                required
                                             />
                                         </Grid>
                                     </Grid>

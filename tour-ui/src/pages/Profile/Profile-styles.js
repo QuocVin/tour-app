@@ -29,6 +29,9 @@ export const useStyles = makeStyles((theme) => ({
   container: {
     maxHeight: 440,
   },
+  body: {
+    marginLeft: '70px'
+  }
 }));
 
 
